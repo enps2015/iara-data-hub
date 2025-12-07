@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="IARA Data Hub - Análise de Água, Saneamento e Saúde na Região Metropolitana de Belém. Dados reais sobre injustiça hídrica, COP30 e ODS na Amazônia.">
+    <title>IARA Data Hub | Água, Saneamento & Saúde na Amazônia</title>
+    
+    <!-- Google Analytics GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-798S93PNCW"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-798S93PNCW');
+    </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- ============================================
+         HEADER - Observatório Sério
+         ============================================ -->
+    <header class="header">
+        <div class="container header-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-water"></i>
+                </div>
+                <span>IARA <span class="text-gradient">DATA HUB</span></span>
+            </a>
+            
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#inicio">Início</a></li>
+                    <li><a href="#contexto">Contexto</a></li>
+                    <li><a href="#pos-cop30">Pós-COP30</a></li>
+                    <li><a href="#indicadores">Indicadores</a></li>
+                    <li><a href="#injustica">Injustiça</a></li>
+                    <li><a href="#timeline">Timeline</a></li>
+                    <li><a href="#municipios">Municípios</a></li>
+                    <li><a href="#lacunas">Lacunas</a></li>
+                    <li><a href="#metodologia">Metodologia</a></li>
+                </ul>
+            </nav>
+            
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/ericpimentel-dados/" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://www.instagram.com/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.facebook.com/" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="https://github.com/enps2015" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================
+         HERO - Belém Vitrine x Belém Real
+         ============================================ -->
+    <section id="inicio" class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-neural"></div>
+        
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-chart-line"></i>
+                Monitoramento RMB 2017–2025
+            </div>
+            
+            <h1>Água, Saneamento &<br>Saúde na <span>Amazônia</span></h1>
+            
+            <p class="hero-subtitle">
+                Belém virou vitrine global com a COP30, BRT Metropolitano e novos parques urbanos.
+                <strong>O IARA Data Hub mostra o que esse legado significa — ou não — para a água, o esgoto e a saúde na Região Metropolitana.</strong>
+            </p>
+            
+            <p class="hero-meta">
+                <i class="fas fa-map-marker-alt"></i> 7 municípios · 
+                <i class="fas fa-calendar-alt"></i> 2017–2025 · 
+                <i class="fas fa-database"></i> saneamento, saúde e risco climático em dados reais
+            </p>
+            
+            <div class="hero-buttons">
+                <a href="#injustica" class="btn-hero-primary">
+                    <i class="fas fa-map-marked-alt"></i>
+                    Ver o Mapa da Injustiça Hídrica
+                </a>
+                <a href="#pos-cop30" class="btn-hero-secondary">
+                    <i class="fas fa-landmark"></i>
+                    Entender o Legado COP30
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         CONTEXTO - Amazônia Urbana, Não Wallpaper
+         ============================================ -->
+    <section id="contexto" class="section-light section-padding">
+        <div class="container">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="mb-4">Entendendo a Crise Invisível</h2>
+                <p class="text-lg" style="color: var(--text-dark-muted)">
+                    A Região Metropolitana de Belém não é a Amazônia de cartão-postal. 
+                    É uma <strong>metrópole complexa</strong> onde água e esgoto são questões de vida ou morte.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Bloco 1: Acelerador COP30 -->
+                <div class="context-block fade-in">
+                    <div class="context-icon orange">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">🚀 Acelerador COP30</h3>
+                    <p style="color: var(--text-dark-muted)" class="mb-4">
+                        A conferência atuou como um <strong>acelerador histórico</strong>: BRT Metropolitano, 
+                        macrodrenagem, Parque da Cidade, Porto Futuro. 
+                        <strong style="color: var(--accent-orange)">Décadas de infraestrutura comprimidas em poucos anos.</strong>
+                    </p>
+                    <p style="color: var(--text-dark-muted)">
+                        98% das obras foram entregues para a COP30. Mas obras pontuais mudam indicadores de saúde pública?
+                    </p>
+                    <div class="context-question">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        A aceleração de obras significa aceleração de resultados para a população?
+                    </div>
+                </div>
+                
+                <!-- Bloco 2: Cidade Vitrine x Cidade Real -->
+                <div class="context-block fade-in" style="transition-delay: 0.1s">
+                    <div class="context-icon magenta">
+                        <i class="fas fa-theater-masks"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">🎭 Vitrine x Realidade</h3>
+                    <p style="color: var(--text-dark-muted)" class="mb-4">
+                        <strong style="color: var(--accent-magenta)">Enquanto áreas nobres experimentam modernização, 
+                        as periferias ainda aguardam universalização</strong> de serviços essenciais.
+                    </p>
+                    <p style="color: var(--text-dark-muted)">
+                        Corredores de BRT e parques turísticos convivem com bairros em palafitas, 
+                        canais abertos e doenças 100% evitáveis.
+                    </p>
+                    <div class="context-question">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        O legado se expandirá para se tornar a cidade de todos, ou ficará restrito à vitrine?
+                    </div>
+                </div>
+                
+                <!-- Bloco 3: Finanças Verdes -->
+                <div class="context-block fade-in" style="transition-delay: 0.2s">
+                    <div class="context-icon cyan">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">💰 Trilhões Verdes</h3>
+                    <p style="color: var(--text-dark-muted)" class="mb-4">
+                        O Fundo Florestas Tropicais para Sempre (TFFF) foi lançado com 
+                        <strong style="color: var(--accent-cyan)">US$ 5,5 bilhões</strong> e 53 países.
+                        Trilhões de dólares em fundos de adaptação climática.
+                    </p>
+                    <p style="color: var(--text-dark-muted)">
+                        Quanto desse dinheiro chega para resolver água e esgoto na RMB? 
+                        Quanto efetivamente reduz as internações por diarreia?
+                    </p>
+                    <div class="context-question">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        Financiamento verde está virando saneamento real ou discurso?
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Frase conclusiva com números -->
+            <div class="alert-box alert-danger max-w-4xl mx-auto mt-10">
+                <p class="font-medium" style="color: var(--text-dark)">
+                    <i class="fas fa-exclamation-triangle mr-2" style="color: var(--accent-magenta)"></i>
+                    <strong>Na prática, isso significa:</strong> A RMB pode ser vendida como "capital climática global", 
+                    enquanto <strong style="color: var(--accent-magenta)">apenas ~20% do esgoto é coletado</strong> 
+                    e <strong style="color: var(--accent-magenta)">mais de 1.200 internações por doenças hídricas</strong> 
+                    ainda ocorrem anualmente — doenças 100% evitáveis com saneamento básico.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         GALERIA DE CONTRASTES - COP30
+         ============================================ -->
+    <section class="section-dark section-padding" style="padding: 4rem 0">
+        <div class="container">
+            <div class="text-center max-w-3xl mx-auto mb-8">
+                <span class="text-sm uppercase tracking-wider mb-2 block" style="color: var(--accent-gold)">
+                    <i class="fas fa-camera mr-2"></i> Olhar Crítico
+                </span>
+                <h2 class="text-white mb-4">O Que as Manchetes Não Mostram</h2>
+                <p style="color: var(--text-light-muted)">
+                    Enquanto Belém vira "vitrine climática", a realidade persiste a poucos metros dos holofotes.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Imagem 1: Maquiagem Verde -->
+                <div class="relative group overflow-hidden rounded-xl" style="aspect-ratio: 16/10">
+                    <img src="img/Maquiagem verde.png" alt="Estrutura COP30 ao lado de lixo nas ruas" 
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <span class="text-xs px-2 py-1 rounded-full mb-2 inline-block" style="background: var(--accent-magenta)">
+                            "Maquiagem Verde"
+                        </span>
+                        <p class="text-white text-sm font-medium">
+                            Estruturas da COP30 dividem espaço com gestão de resíduos precária.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Imagem 2: Obras de Macrodrenagem -->
+                <div class="relative group overflow-hidden rounded-xl" style="aspect-ratio: 16/10">
+                    <img src="img/Obras de macrodrenagem x cotidiano.png" alt="Canal reformado em comunidade" 
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <span class="text-xs px-2 py-1 rounded-full mb-2 inline-block" style="background: var(--accent-cyan)">
+                            Macrodrenagem
+                        </span>
+                        <p class="text-white text-sm font-medium">
+                            Obras de revitalização: infraestrutura chegando às comunidades.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Imagem 3: Povos Indígenas -->
+                <div class="relative group overflow-hidden rounded-xl" style="aspect-ratio: 16/10">
+                    <img src="img/Povos indígenas na cidade COP.png" alt="Povos indígenas protestando na COP30" 
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <span class="text-xs px-2 py-1 rounded-full mb-2 inline-block" style="background: var(--accent-lime)">
+                            Vozes Amazônicas
+                        </span>
+                        <p class="text-white text-sm font-medium">
+                            "Justiça Climática Agora" — quem realmente vive a Amazônia cobra respostas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Smart City Map Reference -->
+            <div class="mt-10 grid lg:grid-cols-2 gap-8 items-center">
+                <div class="relative rounded-xl overflow-hidden" style="border: 1px solid rgba(34, 211, 238, 0.3)">
+                    <img src="img/belem-smart-city-map.png" alt="Mapa de saneamento da RMB" 
+                         class="w-full h-auto">
+                    <div class="absolute top-4 left-4">
+                        <span class="text-xs px-3 py-1 rounded-full" style="background: rgba(0,0,0,0.7); color: var(--accent-cyan)">
+                            <i class="fas fa-map-marked-alt mr-1"></i> Mapa Interativo
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-white text-xl font-bold mb-4">
+                        <i class="fas fa-globe-americas mr-2" style="color: var(--accent-cyan)"></i>
+                        Belém: Smart City ou Dois Mundos?
+                    </h3>
+                    <p class="mb-4" style="color: var(--text-light-muted)">
+                        O mapa revela a geografia da desigualdade: áreas em <strong style="color: var(--accent-cyan)">ciano</strong> 
+                        têm saneamento avançado — geralmente as regiões centrais e turísticas.
+                    </p>
+                    <p class="mb-4" style="color: var(--text-light-muted)">
+                        Áreas em <strong style="color: var(--accent-magenta)">vermelho</strong> indicam 
+                        déficit de saneamento — majoritariamente periferias e baixadas.
+                    </p>
+                    <div class="flex gap-4 text-sm" style="color: var(--text-light-muted)">
+                        <span><i class="fas fa-bus mr-1" style="color: var(--accent-cyan)"></i> Rede BRT</span>
+                        <span><i class="fas fa-tint mr-1" style="color: var(--accent-cyan)"></i> Saneamento</span>
+                        <span><i class="fas fa-exclamation-triangle mr-1" style="color: var(--accent-magenta)"></i> Déficit</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         PÓS-COP30 - Legado, Vitrine e Lacunas
+         ============================================ -->
+    <section id="pos-cop30" class="parallax-section section-padding" style="background-image: url('img/Cidade vitrine x cidade real (imagem comparativa).png');">
+        <div class="parallax-overlay"></div>
+        
+        <div class="container relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-sm uppercase tracking-wider mb-2 block" style="color: var(--accent-gold)">Novembro 2025</span>
+                <h2 class="text-white mb-4">Belém Pós-COP30: Legado, Vitrine e Lacunas</h2>
+                <p style="color: var(--text-light-muted)">
+                    A 30ª Conferência das Partes transformou Belém. Mas o que ficou depois que os holofotes se apagaram?
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Coluna 1: O que foi entregue -->
+                <div class="panel-dark p-6 rounded-2xl">
+                    <h3 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-check-circle" style="color: var(--accent-lime)"></i>
+                        O que entrou na manchete
+                    </h3>
+                    <ul class="space-y-3" style="color: var(--text-light-muted)">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-bus mt-1" style="color: var(--accent-cyan)"></i>
+                            <span><strong class="text-white">BRT Metropolitano:</strong> 21,6km, 13 estações, 40 ônibus elétricos, tarifa integrada R$4,60.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-tree mt-1" style="color: var(--accent-lime)"></i>
+                            <span><strong class="text-white">Parque da Cidade:</strong> Maior área de lazer da capital, no antigo aeroporto.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-anchor mt-1" style="color: var(--accent-cyan)"></i>
+                            <span><strong class="text-white">Porto Futuro II:</strong> Hub de bioeconomia, Museu das Amazônias, gastronomia local.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-water mt-1" style="color: var(--accent-cyan)"></i>
+                            <span><strong class="text-white">Macrodrenagem:</strong> Bacias do Tucunduba, Una, Tamandaré. Canais da Vileta e União.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-handshake mt-1" style="color: var(--accent-gold)"></i>
+                            <span><strong class="text-white">TFFF:</strong> US$ 5,5 bilhões, 53 países, pagamento por floresta em pé.</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Coluna 2: O que NÃO entrou -->
+                <div class="panel-dark p-6 rounded-2xl" style="border-color: var(--accent-magenta) !important;">
+                    <h3 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--accent-magenta)"></i>
+                        O que NÃO entrou na foto oficial
+                    </h3>
+                    <ul class="space-y-3" style="color: var(--text-light-muted)">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-times-circle mt-1" style="color: var(--accent-magenta)"></i>
+                            <span><strong class="text-white">Universalização adiada:</strong> Meta de saneamento para Belém só em 2033.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-times-circle mt-1" style="color: var(--accent-magenta)"></i>
+                            <span><strong class="text-white">Vila da Barca:</strong> Rede de esgoto completa só em abril de 2026.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-times-circle mt-1" style="color: var(--accent-magenta)"></i>
+                            <span><strong class="text-white">Disparidades:</strong> Barcarena com 99% água, Benevides com dados zerados.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-times-circle mt-1" style="color: var(--accent-magenta)"></i>
+                            <span><strong class="text-white">Maquiagem verde:</strong> Árvores artificiais na decoração, gestão de resíduos precária.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-times-circle mt-1" style="color: var(--accent-magenta)"></i>
+                            <span><strong class="text-white">Combustíveis fósseis:</strong> Sem cronograma de eliminação na Declaração Final.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="alert-box alert-warning dark max-w-4xl mx-auto mt-10">
+                <p class="text-white font-medium mb-3">
+                    <i class="fas fa-eye mr-2" style="color: var(--accent-gold)"></i>
+                    <strong>O IARA existe para medir o que ficou depois da desmontagem dos palcos.</strong>
+                    Não repetimos discursos oficiais — mostramos números que revelam a distância entre promessa e realidade.
+                </p>
+                <p class="text-sm" style="color: var(--text-light-muted)">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    <strong style="color: var(--accent-gold)">Conclusão:</strong> 
+                    Se, nos próximos anos, as curvas de internações e cobertura de esgoto não se deslocarem de forma consistente, 
+                    o legado da COP30 terá sido mais concreto e vitrine do que <strong class="text-white">justiça hídrica</strong> para quem realmente precisa.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         INDICADORES & ODS
+         ============================================ -->
+    <section id="indicadores" class="section-light section-padding">
+        <div class="container">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="mb-4">Indicadores & ODS</h2>
+                <p style="color: var(--text-dark-muted)">
+                    O IARA monitora 4 Objetivos de Desenvolvimento Sustentável cruciais para a Amazônia urbana.
+                    Não são metas abstratas — são <strong>indicadores de sobrevivência</strong>.
+                </p>
+            </div>
+            
+            <!-- ODS Cards -->
+            <div class="ods-grid mb-12">
+                <div class="ods-card fade-in">
+                    <div class="ods-icon ods-6">6</div>
+                    <h3 class="font-bold text-lg mb-2">Água Potável e Saneamento</h3>
+                    <p class="text-sm mb-4" style="color: var(--text-dark-muted)">
+                        A base da dignidade humana. Na RMB, a cobertura de água mascara a precariedade do esgoto.
+                    </p>
+                    <ul class="text-sm text-left space-y-1" style="color: var(--text-dark-muted)">
+                        <li>• Cobertura de água tratada (%)</li>
+                        <li>• Coleta de esgoto (%)</li>
+                        <li>• Perdas na distribuição</li>
+                    </ul>
+                </div>
+                
+                <div class="ods-card fade-in" style="transition-delay: 0.1s">
+                    <div class="ods-icon ods-3">3</div>
+                    <h3 class="font-bold text-lg mb-2">Saúde e Bem-estar</h3>
+                    <p class="text-sm mb-4" style="color: var(--text-dark-muted)">
+                        Doenças hídricas são 100% evitáveis. Cada internação é uma falha de política pública.
+                    </p>
+                    <ul class="text-sm text-left space-y-1" style="color: var(--text-dark-muted)">
+                        <li>• Internações por doenças hídricas</li>
+                        <li>• Taxa por 10 mil habitantes</li>
+                        <li>• CIDs A00-A09 (intestinais)</li>
+                    </ul>
+                </div>
+                
+                <div class="ods-card fade-in" style="transition-delay: 0.2s">
+                    <div class="ods-icon ods-11">11</div>
+                    <h3 class="font-bold text-lg mb-2">Cidades Sustentáveis</h3>
+                    <p class="text-sm mb-4" style="color: var(--text-dark-muted)">
+                        Urbanização inclusiva significa serviços básicos para todos, não só para a vitrine.
+                    </p>
+                    <ul class="text-sm text-left space-y-1" style="color: var(--text-dark-muted)">
+                        <li>• Infraestrutura básica</li>
+                        <li>• Acesso a transporte</li>
+                        <li>• Resiliência a desastres</li>
+                    </ul>
+                </div>
+                
+                <div class="ods-card fade-in" style="transition-delay: 0.3s">
+                    <div class="ods-icon ods-13">13</div>
+                    <h3 class="font-bold text-lg mb-2">Ação Climática</h3>
+                    <p class="text-sm mb-4" style="color: var(--text-dark-muted)">
+                        Belém é vulnerável a enchentes e extremos climáticos. Adaptação não é luxo.
+                    </p>
+                    <ul class="text-sm text-left space-y-1" style="color: var(--text-dark-muted)">
+                        <li>• Índice de risco climático</li>
+                        <li>• Obras de drenagem</li>
+                        <li>• Exposição a alagamentos</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- KPIs -->
+            <div class="section-dark rounded-2xl p-8">
+                <h3 class="text-white text-xl font-bold text-center mb-6">
+                    Retrato da RMB em 2023 <span class="text-sm font-normal" style="color: var(--text-light-muted)">(média ponderada)</span>
+                </h3>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="color: var(--accent-cyan)" id="kpi-water">--</div>
+                        <div class="kpi-label">Cobertura de Água</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="color: var(--accent-magenta)" id="kpi-sewage">--</div>
+                        <div class="kpi-label">Coleta de Esgoto</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="color: var(--accent-orange)" id="kpi-disease">--</div>
+                        <div class="kpi-label">Internações/10k hab</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="color: var(--accent-gold)" id="kpi-risk">--</div>
+                        <div class="kpi-label">Risco Climático</div>
+                    </div>
+                </div>
+                
+                <p class="text-center text-sm mt-6" style="color: var(--text-light-muted)">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    <strong style="color: var(--accent-magenta)">Atenção:</strong> A média da RMB esconde desigualdade municipal brutal. 
+                    O resto do site mostra essa fissura.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         VISUALIZAÇÃO 1: MAPA DA INJUSTIÇA HÍDRICA
+         ============================================ -->
+    <section id="injustica" class="section-dark section-padding">
+        <div class="container">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Texto explicativo -->
+                <div class="lg:col-span-1">
+                    <span class="text-sm uppercase tracking-wider mb-2 block" style="color: var(--accent-magenta)">
+                        Visualização-Assinatura #1
+                    </span>
+                    <h2 class="text-white mb-4">Mapa da Injustiça Hídrica 2023</h2>
+                    
+                    <p class="mb-4" style="color: var(--text-light-muted)">
+                        Este gráfico revela a <strong class="text-white">correlação mortal</strong>: 
+                        menos saneamento = mais doenças. Cada bolha é um município da RMB.
+                    </p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-center gap-3 text-sm" style="color: var(--text-light-muted)">
+                            <i class="fas fa-arrows-alt-h" style="color: var(--accent-cyan)"></i>
+                            <span><strong class="text-white">Eixo X:</strong> Coleta de Esgoto (%). Direita = melhor.</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm" style="color: var(--text-light-muted)">
+                            <i class="fas fa-arrows-alt-v" style="color: var(--accent-magenta)"></i>
+                            <span><strong class="text-white">Eixo Y:</strong> Internações/10k hab. Cima = pior.</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm" style="color: var(--text-light-muted)">
+                            <i class="fas fa-circle" style="color: var(--accent-gold)"></i>
+                            <span><strong class="text-white">Tamanho:</strong> População do município.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="alert-box alert-danger dark">
+                        <h4 class="font-bold mb-2" style="color: var(--accent-magenta)">
+                            <i class="fas fa-crosshairs mr-2"></i> Zona Crítica
+                        </h4>
+                        <p class="text-sm" style="color: var(--text-light-muted)">
+                            O canto <strong class="text-white">superior esquerdo</strong> é onde ninguém quer estar: 
+                            alta taxa de doença + baixa cobertura de esgoto.
+                        </p>
+                    </div>
+                    
+                    <!-- Texto explícito sobre zona ideal -->
+                    <div class="alert-box alert-info dark mt-4" style="border-color: var(--accent-cyan) !important">
+                        <p class="text-sm" style="color: var(--text-light-muted)">
+                            <i class="fas fa-exclamation-circle mr-2" style="color: var(--accent-cyan)"></i>
+                            <strong class="text-white">Nenhum município da RMB está na zona ideal</strong> 
+                            (alta coleta de esgoto + baixa taxa de internações). 
+                            O melhor caso ainda está longe do padrão de cidades com saneamento universalizado.
+                        </p>
+                    </div>
+                    
+                    <div class="mt-6 p-4 rounded-lg" style="background: rgba(255,255,255,0.05)">
+                        <h4 class="font-bold mb-2 text-white">🔍 Para pensar:</h4>
+                        <ul class="text-sm space-y-2" style="color: var(--text-light-muted)">
+                            <li>• Que tipo de intervenção move um município para fora do quadrante crítico nos próximos 5 anos?</li>
+                            <li>• Se Belém (a capital) está na zona crítica em 2023, o que isso diz sobre prioridades de investimento?</li>
+                            <li>• Qual município tem melhor relação custo-benefício para receber investimentos?</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Gráfico -->
+                <div class="lg:col-span-2">
+                    <div class="chart-section" style="border: 1px solid rgba(236, 72, 153, 0.3); box-shadow: 0 0 30px rgba(236, 72, 153, 0.1)">
+                        <div class="chart-container">
+                            <canvas id="chartInjustica"></canvas>
+                        </div>
+                    </div>
+                    <p class="text-center text-xs mt-4" style="color: var(--text-light-muted)">
+                        Fonte: SNIS/DATASUS 2023. Linhas tracejadas = medianas. Bolhas = população.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         VISUALIZAÇÃO 2: LINHA DO TEMPO
+         ============================================ -->
+    <section id="timeline" class="section-light-alt section-padding">
+        <div class="container">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="text-sm uppercase tracking-wider mb-2 block" style="color: var(--accent-orange)">
+                    Visualização-Assinatura #2
+                </span>
+                <h2 class="mb-4">Linha do Tempo: 2017–2025</h2>
+                <p style="color: var(--text-dark-muted)">
+                    A evolução histórica não mente. Observe como a curva de internações (magenta) 
+                    reage — ou não — aos investimentos em esgoto (ciano) ao longo dos anos.
+                </p>
+            </div>
+            
+            <div class="section-dark rounded-2xl p-6 md:p-8">
+                <div class="chart-container">
+                    <canvas id="chartTimeline"></canvas>
+                </div>
+                
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--accent-magenta)"></div>
+                        <span>Internações por 10k hab</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--accent-cyan)"></div>
+                        <span>Coleta de Esgoto (%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: rgba(255,255,255,0.3)"></div>
+                        <span>2019–2023: Aceleração</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6 mt-8">
+                <div class="panel p-6">
+                    <h4 class="font-bold mb-2">📊 Leitura do gráfico</h4>
+                    <p class="text-sm" style="color: var(--text-dark-muted)">
+                        A faixa sombreada (2019–2023) representa a janela de dados robustos e aceleração de obras.
+                        A linha dourada em 2025 marca a COP30. 
+                        <strong>Observe:</strong> a curva de internações (magenta) acompanha — ou não — os investimentos em esgoto (ciano).
+                    </p>
+                </div>
+                <div class="panel p-6" style="border-left: 3px solid var(--accent-magenta)">
+                    <h4 class="font-bold mb-2" style="color: var(--accent-magenta)">⚠️ O que isso significa</h4>
+                    <p class="text-sm" style="color: var(--text-dark-muted)">
+                        <strong>Se a curva de obras sobe mas a curva de internações não cai na mesma proporção, 
+                        existe descompasso entre infraestrutura entregue e efeito em saúde pública.</strong>
+                        O legado real se mede em vidas, não em quilômetros de tubos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         MUNICÍPIOS - RAIO-X
+         ============================================ -->
+    <section id="municipios" class="section-light section-padding">
+        <div class="container">
+            <div class="max-w-3xl mb-10">
+                <h2 class="mb-4">
+                    <i class="fas fa-map-marked-alt mr-2" style="color: var(--accent-cyan)"></i>
+                    Raio-X dos Municípios
+                </h2>
+                <p style="color: var(--text-dark-muted)">
+                    Conheça cada cidade da RMB individualmente. Os dados mostram a cobertura de água e esgoto (2023), 
+                    além da tendência histórica de internações. <strong>Clique em um card para ver detalhes.</strong>
+                </p>
+            </div>
+            
+            <div id="municipality-grid" class="municipality-grid">
+                <!-- Cards injetados por JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         VISUALIZAÇÃO 3: LACUNAS (APAGÃO DE DADOS)
+         ============================================ -->
+    <section id="lacunas" class="section-dark section-padding">
+        <div class="container">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Matriz -->
+                <div class="lg:col-span-2">
+                    <span class="text-sm uppercase tracking-wider mb-2 block" style="color: var(--text-light-muted)">
+                        Visualização-Assinatura #3
+                    </span>
+                    <h2 class="text-white mb-4">O Apagão de Dados</h2>
+                    
+                    <div class="data-matrix panel-dark p-4 rounded-xl" id="matrixContainer">
+                        <!-- Matrix injetada por JavaScript -->
+                    </div>
+                    
+                    <!-- Cell count display -->
+                    <div class="mt-4 p-3 rounded-lg" style="background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3)">
+                        <p class="text-sm font-medium text-white" id="matrixCellCount">
+                            <i class="fas fa-calculator mr-2" style="color: var(--accent-magenta)"></i>
+                            Carregando contagem...
+                        </p>
+                    </div>
+                    
+                    <div class="flex gap-6 mt-4 text-sm" style="color: var(--text-light-muted)">
+                        <div class="flex items-center gap-2">
+                            <div class="w-5 h-5 rounded" style="background: var(--accent-cyan)"></div>
+                            <span>Dado reportado</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-5 h-5 rounded" style="background: #374151; opacity: 0.5"></div>
+                            <span><strong style="color: var(--accent-magenta)">APAGÃO</strong> - Decisões sem dados</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-xs mt-3" style="color: var(--text-light-muted)">
+                        <i class="fas fa-lightbulb mr-1" style="color: var(--accent-gold)"></i>
+                        <strong>Cada célula cinza é um ano em que a RMB discute saneamento e saúde com base em percepção, não em dados.</strong>
+                    </p>
+                </div>
+                
+                <!-- Texto lateral -->
+                <div class="lg:col-span-1">
+                    <div class="panel-dark p-6 rounded-xl h-full" style="border-color: var(--accent-gold) !important;">
+                        <h3 class="text-white text-xl font-bold mb-4">
+                            <i class="fas fa-eye-slash mr-2" style="color: var(--accent-gold)"></i>
+                            Governando no Escuro
+                        </h3>
+                        
+                        <p class="mb-4" style="color: var(--text-light-muted)">
+                            A transparência é o primeiro passo para a solução. Esta matriz mostra quando cada 
+                            município enviou dados ao SNIS (Sistema Nacional de Informações sobre Saneamento).
+                        </p>
+                        
+                        <ul class="space-y-3 mb-6" style="color: var(--text-light-muted)">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check mt-1" style="color: var(--accent-cyan)"></i>
+                                <span><strong class="text-white">2019–2023:</strong> Primeira janela robusta de dados.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check mt-1" style="color: var(--accent-cyan)"></i>
+                                <span><strong class="text-white">2023:</strong> Único ano com cobertura completa.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-times mt-1" style="color: var(--accent-magenta)"></i>
+                                <span><strong class="text-white">Anos cinza:</strong> Prefeituras que não enviaram dados.</span>
+                            </li>
+                        </ul>
+                        
+                        <div class="p-4 rounded-lg" style="background: rgba(236, 72, 153, 0.15); border-left: 3px solid var(--accent-magenta)">
+                            <p class="text-sm font-medium text-white">
+                                "98% das obras foram entregues para a COP30. Os buracos cinza mostram onde 
+                                <strong style="color: var(--accent-magenta)">0% de dados</strong> existem para avaliar o impacto."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         CTAs INTELECTUAIS
+         ============================================ -->
+    <section class="section-dark section-padding" style="background: var(--bg-dark-alt)">
+        <div class="container">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <h2 class="text-white mb-4">O que você pode fazer com esses dados?</h2>
+                <p style="color: var(--text-light-muted)">
+                    Este site não é turismo de dados. É ferramenta para ação.
+                </p>
+            </div>
+            
+            <div class="cta-grid">
+                <div class="cta-box">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background: rgba(34, 211, 238, 0.15)">
+                        <i class="fas fa-city text-xl" style="color: var(--accent-cyan)"></i>
+                    </div>
+                    <h4>Sou gestor municipal</h4>
+                    <p>Por onde começo? Veja o mapa da injustiça para identificar prioridades e compare seu município com os vizinhos.</p>
+                    <a href="#injustica" class="btn btn-primary btn-sm">
+                        <i class="fas fa-arrow-right"></i> Ver diagnóstico
+                    </a>
+                </div>
+                
+                <div class="cta-box">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background: rgba(163, 230, 53, 0.15)">
+                        <i class="fas fa-flask text-xl" style="color: var(--accent-lime)"></i>
+                    </div>
+                    <h4>Sou pesquisador</h4>
+                    <p>Como usar este dataset? Acesse a metodologia completa e o repositório GitHub com os dados brutos.</p>
+                    <a href="#metodologia" class="btn btn-primary btn-sm">
+                        <i class="fas fa-arrow-right"></i> Ver metodologia
+                    </a>
+                </div>
+                
+                <div class="cta-box">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background: rgba(236, 72, 153, 0.15)">
+                        <i class="fas fa-bullhorn text-xl" style="color: var(--accent-magenta)"></i>
+                    </div>
+                    <h4>Sou cidadão</h4>
+                    <p>O que posso cobrar na audiência pública? Leve estas 3 perguntas para sua câmara municipal:</p>
+                    <ul class="text-sm space-y-1 mb-4" style="color: var(--text-light-muted)">
+                        <li>1. Qual a meta de esgoto para 2025?</li>
+                        <li>2. Quantas internações hídricas tivemos?</li>
+                        <li>3. Por que não enviamos dados ao SNIS?</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         METODOLOGIA & SOBRE
+         ============================================ -->
+    <section id="metodologia" class="section-light section-padding">
+        <div class="container">
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Metodologia -->
+                <div>
+                    <h2 class="mb-6">
+                        <i class="fas fa-microscope mr-2" style="color: var(--accent-cyan)"></i>
+                        Metodologia
+                    </h2>
+                    
+                    <h4 class="font-bold mb-3">Fontes de Dados</h4>
+                    <ul class="space-y-2 mb-6" style="color: var(--text-dark-muted)">
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-database mt-1" style="color: var(--accent-cyan)"></i>
+                            <span><strong>IBGE:</strong> População (Censo 2022 + Estimativas anuais)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-database mt-1" style="color: var(--accent-cyan)"></i>
+                            <span><strong>SNIS/SINISA:</strong> Água, Esgoto, Tarifas (2017–2023)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-database mt-1" style="color: var(--accent-cyan)"></i>
+                            <span><strong>DATASUS (SIH):</strong> Internações hospitalares por CIDs A00–A09</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-database mt-1" style="color: var(--accent-cyan)"></i>
+                            <span><strong>INMET:</strong> Dados climáticos históricos da região</span>
+                        </li>
+                    </ul>
+                    
+                    <h4 class="font-bold mb-3">Critérios</h4>
+                    <ul class="space-y-2 mb-6" style="color: var(--text-dark-muted)">
+                        <li>• <strong>Doenças hídricas:</strong> CIDs A00–A09 (doenças intestinais infecciosas)</li>
+                        <li>• <strong>Taxa padronizada:</strong> Internações por 10 mil habitantes</li>
+                        <li>• <strong>Janela temporal:</strong> 2017–2025 (projeções para 2024-25)</li>
+                        <li>• <strong>Escopo:</strong> 7 municípios da Região Metropolitana de Belém</li>
+                    </ul>
+                    
+                    <div class="alert-box alert-info">
+                        <p class="text-sm">
+                            <i class="fas fa-shield-alt mr-2" style="color: var(--accent-cyan)"></i>
+                            <strong>Compromisso:</strong> Nenhum dado de saneamento ou saúde foi inventado ou completado por IA. 
+                            Lacunas foram mantidas como null para preservar a integridade da análise.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Sobre -->
+                <div>
+                    <h2 class="mb-6">
+                        <i class="fas fa-user-graduate mr-2" style="color: var(--accent-orange)"></i>
+                        Sobre o Autor
+                    </h2>
+                    
+                    <div class="panel p-6 mb-6">
+                        <h3 class="font-bold text-xl mb-2">Eric Pimentel</h3>
+                        <p class="text-sm mb-4" style="color: var(--text-dark-muted)">
+                            Engenheiro, Cientista de Dados e pesquisador em <strong>Inteligência Artificial aplicada à Sustentabilidade</strong>. 
+                            Focado em traduzir dados públicos em insights acionáveis para políticas de saneamento e saúde.
+                        </p>
+                        
+                        <div class="flex gap-4">
+                            <a href="https://www.linkedin.com/in/ericpimentel-dados/" target="_blank" class="text-xl" style="color: var(--text-dark-muted)" title="LinkedIn">
+                                <i class="fab fa-linkedin hover:text-[#0077b5]"></i>
+                            </a>
+                            <a href="https://github.com/enps2015" target="_blank" class="text-xl" style="color: var(--text-dark-muted)" title="GitHub">
+                                <i class="fab fa-github hover:text-[#333]"></i>
+                            </a>
+                            <a href="https://www.instagram.com/" target="_blank" class="text-xl" style="color: var(--text-dark-muted)" title="Instagram">
+                                <i class="fab fa-instagram hover:text-[#e4405f]"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="panel p-6" style="background: var(--bg-light-alt)">
+                        <h4 class="font-bold mb-3">Sobre o IARA Data Hub</h4>
+                        <p class="text-sm mb-4" style="color: var(--text-dark-muted)">
+                            IARA = <strong>Indicadores de Água, Resiliência e Adaptação</strong>. 
+                            Este projeto nasceu da necessidade de traduzir dados dispersos em uma narrativa visual que 
+                            conecta saneamento, saúde e clima na Amazônia urbana.
+                        </p>
+                        <p class="text-xs" style="color: var(--text-dark-muted)">
+                            Desenvolvido com dados públicos e auxílio de ferramentas de Inteligência Artificial.
+                            <br>© 2025 IARA Data Hub. Uso livre com atribuição.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         INFRAESTRUTURA REAL DA RMB
+         ============================================ -->
+    <section class="section-light-alt" style="padding: 2rem 0 4rem 0">
+        <div class="container">
+            <div class="text-center max-w-3xl mx-auto mb-8">
+                <span class="text-sm uppercase tracking-wider mb-2 block" style="color: var(--accent-orange)">
+                    <i class="fas fa-hard-hat mr-2"></i> Olhar Técnico
+                </span>
+                <h2 class="mb-4">Infraestrutura Real da RMB</h2>
+                <p style="color: var(--text-dark-muted)">
+                    Conheça as instalações reais que tratam água e esgoto na Região Metropolitana de Belém.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <!-- ETA Bolonha -->
+                <div class="relative group overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 4/3">
+                    <img src="img/eta_bolonha-cosanpa.jpg" alt="ETA Bolonha - Estação de Tratamento de Água" 
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <span class="text-xs px-2 py-1 rounded-full mb-2 inline-block" style="background: var(--accent-cyan)">
+                            Tratamento de Água
+                        </span>
+                        <h4 class="text-white font-bold">ETA Bolonha</h4>
+                        <p class="text-white text-xs opacity-80">COSANPA - Principal estação de Belém</p>
+                    </div>
+                </div>
+
+                <!-- ETE Una -->
+                <div class="relative group overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 4/3">
+                    <img src="img/ete_una_belem.jpeg" alt="ETE Una - Estação de Tratamento de Esgoto" 
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <span class="text-xs px-2 py-1 rounded-full mb-2 inline-block" style="background: var(--accent-magenta)">
+                            Tratamento de Esgoto
+                        </span>
+                        <h4 class="text-white font-bold">ETE Una</h4>
+                        <p class="text-white text-xs opacity-80">Maior estação de esgoto do Pará</p>
+                    </div>
+                </div>
+
+                <!-- Canal Reformado -->
+                <div class="relative group overflow-hidden rounded-xl shadow-lg" style="aspect-ratio: 4/3">
+                    <img src="img/canal_reformado_belem.png" alt="Canal reformado em Belém" 
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <span class="text-xs px-2 py-1 rounded-full mb-2 inline-block" style="background: var(--accent-lime); color: #0f172a">
+                            Macrodrenagem
+                        </span>
+                        <h4 class="text-white font-bold">Canal Reformado</h4>
+                        <p class="text-white text-xs opacity-80">Obras COP30 - Revitalização urbana</p>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-center text-sm mt-6" style="color: var(--text-dark-muted)">
+                <i class="fas fa-info-circle mr-1"></i>
+                Fotos: COSANPA, Prefeitura de Belém. 
+                <strong>ETA</strong> = Estação de Tratamento de Água | 
+                <strong>ETE</strong> = Estação de Tratamento de Esgoto
+            </p>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FOOTER
+         ============================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="logo mb-4">
+                        <div class="logo-icon">
+                            <i class="fas fa-water"></i>
+                        </div>
+                        <span>IARA DATA HUB</span>
+                    </div>
+                    <p class="text-sm" style="color: var(--text-light-muted)">
+                        Vigilância cidadã sobre água, saneamento e saúde na Região Metropolitana de Belém.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4>Navegação</h4>
+                    <ul>
+                        <li><a href="#contexto">Contexto</a></li>
+                        <li><a href="#pos-cop30">Pós-COP30</a></li>
+                        <li><a href="#indicadores">Indicadores</a></li>
+                        <li><a href="#injustica">Injustiça Hídrica</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4>Dados</h4>
+                    <ul>
+                        <li><a href="#timeline">Linha do Tempo</a></li>
+                        <li><a href="#municipios">Municípios</a></li>
+                        <li><a href="#lacunas">Lacunas</a></li>
+                        <li><a href="#metodologia">Metodologia</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4>Conecte-se</h4>
+                    <div class="flex gap-4 text-xl">
+                        <a href="https://www.linkedin.com/in/ericpimentel-dados/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/enps2015" target="_blank"><i class="fab fa-github"></i></a>
+                        <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>
+                    Desenvolvido por <strong>Eric Pimentel</strong> com auxílio de ferramentas de IA · 
+                    Dados públicos de IBGE, SNIS, DATASUS, INMET · 
+                    © 2025 IARA Data Hub
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================
+         MUNICIPALITY DETAIL MODAL
+         ============================================ -->
+    <div id="municipalityModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nome do Município</h2>
+                <p class="subtitle" id="modalSubtitle">Dados de saneamento e saúde 2017-2025</p>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- KPIs 2023 -->
+                <div class="modal-kpis" id="modalKpis">
+                    <div class="modal-kpi">
+                        <div class="modal-kpi-value cyan" id="modalAgua">--</div>
+                        <div class="modal-kpi-label">Água (2023)</div>
+                    </div>
+                    <div class="modal-kpi">
+                        <div class="modal-kpi-value cyan" id="modalEsgoto">--</div>
+                        <div class="modal-kpi-label">Esgoto (2023)</div>
+                    </div>
+                    <div class="modal-kpi">
+                        <div class="modal-kpi-value magenta" id="modalIntern">--</div>
+                        <div class="modal-kpi-label">Internações/10k</div>
+                    </div>
+                    <div class="modal-kpi">
+                        <div class="modal-kpi-value orange" id="modalRisco">--</div>
+                        <div class="modal-kpi-label">Risco Climático</div>
+                    </div>
+                </div>
+                
+                <!-- Timeline Chart -->
+                <div class="modal-chart-container">
+                    <div class="modal-chart-title">
+                        <i class="fas fa-chart-line"></i>
+                        Evolução Histórica 2017-2025
+                    </div>
+                    <div class="modal-chart">
+                        <canvas id="modalChart"></canvas>
+                    </div>
+                    <div class="modal-legend">
+                        <div class="modal-legend-item">
+                            <div class="modal-legend-dot" style="background: var(--accent-magenta)"></div>
+                            <span>Internações/10k hab</span>
+                        </div>
+                        <div class="modal-legend-item">
+                            <div class="modal-legend-dot" style="background: var(--accent-cyan)"></div>
+                            <span>Cobertura de Água (%)</span>
+                        </div>
+                        <div class="modal-legend-item">
+                            <div class="modal-legend-dot" style="background: var(--accent-lime)"></div>
+                            <span>Coleta de Esgoto (%)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Comparison with RMB -->
+                <div class="modal-comparison">
+                    <h4>
+                        <i class="fas fa-balance-scale"></i>
+                        Comparação com a Média da RMB (2023)
+                    </h4>
+                    <div class="comparison-bars" id="comparisonBars">
+                        <!-- Bars populated by JS -->
+                    </div>
+                </div>
+                
+                <!-- Leitura Rápida -->
+                <div class="modal-quick-read" id="modalQuickRead" style="background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 12px; padding: 1rem; margin-top: 1.5rem">
+                    <h4 style="color: var(--accent-magenta); font-size: 0.9rem; margin-bottom: 0.5rem">
+                        <i class="fas fa-bolt mr-2"></i> Leitura Rápida
+                    </h4>
+                    <div id="quickReadContent" style="color: var(--text-light-muted); font-size: 0.875rem; line-height: 1.5">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="modal-nav" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1)">
+                    <button id="modalPrev" onclick="navigateModal(-1)" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: rgba(34, 211, 238, 0.15); border: 1px solid var(--accent-cyan); border-radius: 8px; color: var(--accent-cyan); font-size: 0.875rem; cursor: pointer; transition: all 0.3s">
+                        <span style="font-size: 1.2rem">◀</span> Anterior
+                    </button>
+                    <span id="modalCounter" style="color: var(--text-light-muted); font-size: 0.9rem; font-weight: 600">1 / 7</span>
+                    <button id="modalNext" onclick="navigateModal(1)" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: rgba(34, 211, 238, 0.15); border: 1px solid var(--accent-cyan); border-radius: 8px; color: var(--accent-cyan); font-size: 0.875rem; cursor: pointer; transition: all 0.3s">
+                        Próximo <span style="font-size: 1.2rem">▶</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <p class="modal-footer-text">
+                    <i class="fas fa-database"></i>
+                    Fonte: <strong>SNIS/DATASUS 2023</strong>
+                </p>
+                <p class="modal-footer-text">
+                    Clique fora ou pressione <strong>ESC</strong> para fechar
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/dataUtils.js"></script>
+    <script src="assets/js/charts.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

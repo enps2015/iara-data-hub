@@ -1,0 +1,243 @@
+# 🌊 IARA Data Hub
+
+**Indicadores de Água, Resiliência e Adaptação – Região Metropolitana de Belém**
+
+![IARA Data Hub Cover](img/iara_cover.png)
+
+![Status](https://img.shields.io/badge/Status-Ativo-brightgreen)
+![Dados](https://img.shields.io/badge/Dados-2017--2025-blue)
+![Licença](https://img.shields.io/badge/Licença-CC_BY_4.0-orange)
+
+## 📌 Sobre o Projeto
+
+O **IARA Data Hub** é um observatório de dados sobre água, saneamento e saúde na Região Metropolitana de Belém (RMB), criado no contexto pós-COP30.
+
+> _"Belém virou vitrine global com a COP30. O IARA mostra o que esse legado significa — ou não — para a água, o esgoto e a saúde na Região Metropolitana."_
+
+### 🎯 Objetivo
+
+Traduzir dados públicos dispersos em uma narrativa visual que conecta **saneamento, saúde e clima** na Amazônia urbana, permitindo:
+
+- Vigilância cidadã sobre indicadores essenciais
+- Análise crítica do legado da COP30
+- Identificação de lacunas de dados e desigualdades
+
+---
+
+## 💡 Motivação
+
+A COP30 trouxe Belém aos holofotes globais como "capital climática". BRT, parques, macrodrenagem e bilhões em fundos verdes foram anunciados. Mas enquanto as manchetes celebravam obras de infraestrutura, uma pergunta permanecia sem resposta:
+
+> **"O que esses investimentos significam para quem ainda convive com esgoto a céu aberto, água intermitente e doenças 100% evitáveis?"**
+
+Como profissional de dados e morador da Amazônia, percebi que **os dados existiam, mas estavam dispersos**. O SNIS tem informações sobre saneamento, o DATASUS sobre internações, o IBGE sobre população — mas ninguém estava conectando esses pontos para contar a história completa.
+
+O IARA nasceu dessa necessidade: **um observatório crítico que não repete discursos oficiais, mas mostra a distância entre promessa e realidade através de dados.**
+
+---
+
+## 🔍 O Que Este Projeto Demonstra
+
+### Correlações importantes:
+
+- **Saneamento × Saúde**: Municípios com menor cobertura de esgoto apresentam maiores taxas de internações por doenças hídricas
+- **Apagão de Dados**: Apenas 2023 tem cobertura completa na RMB; anos anteriores têm lacunas significativas que dificultam políticas públicas
+- **Desigualdade Metropolitana**: Enquanto alguns municípios avançam, outros permanecem na "zona crítica" do mapa da injustiça hídrica
+
+### Insights visuais:
+
+- O **Mapa da Injustiça Hídrica** mostra que nenhum município da RMB está na zona ideal (alta coleta + baixa doença)
+- A **Linha do Tempo** revela se a aceleração de obras (2019-2023) impactou a curva de internações
+- A **Matriz de Dados** expõe quanto da gestão pública é feita "no escuro", sem informações básicas
+
+---
+
+## 🚧 Dificuldades Enfrentadas
+
+### Coleta de dados:
+
+- **Inconsistência entre fontes**: Dados do SNIS e IBGE usam metodologias diferentes
+- **Lacunas temporais**: Muitos municípios simplesmente não reportam dados em certos anos
+- **Defasagem**: Dados de saneamento mais recentes são de 2023; 2024-2025 ainda são projeções
+
+### Técnicas:
+
+- **Integração de múltiplas fontes**: Unificar SNIS, DATASUS, IBGE e dados climáticos em um único JSON
+- **Visualizações responsivas**: Garantir que gráficos complexos funcionem em mobile
+- **Performance**: Otimizar carregamento com dados históricos de 9 anos × 7 municípios
+
+### Conceituais:
+
+- **Evitar sensacionalismo**: Apresentar dados críticos sem perder rigor
+- **Balancear complexidade**: Dashboard técnico o suficiente para pesquisadores, acessível para cidadãos
+
+---
+
+## 🔮 Melhorias Futuras
+
+### Análises planejadas:
+
+- [ ] **Correlação clima × internações**: Cruzar dados de pluviometria com picos de doenças hídricas
+- [ ] **Análise de custo-efetividade**: Quanto cada R$1 em saneamento economiza em internações?
+- [ ] **Comparação nacional**: Posicionar a RMB em relação a outras regiões metropolitanas brasileiras
+- [ ] **Previsão com ML**: Modelo preditivo de internações baseado em cobertura de saneamento
+
+### Funcionalidades:
+
+- [ ] **Exportar dados**: Botão para download do JSON/CSV filtrado
+- [ ] **Modo comparativo**: Selecionar 2 municípios lado a lado
+- [ ] **Histórico de atualizações**: Changelog visual de quando dados foram atualizados
+- [ ] **API pública**: Endpoint para integração com outros projetos
+
+### Expansão:
+
+- [ ] **Mais municípios**: Incluir toda a área de influência da RMB
+- [ ] **Mais indicadores**: Coleta seletiva, tratamento de esgoto, qualidade da água
+- [ ] **Séries temporais mais longas**: Dados desde 2010 para análise de longo prazo
+
+---
+
+## 📊 Dados Utilizados
+
+| Fonte             | Dados                                   | Período   |
+| ----------------- | --------------------------------------- | --------- |
+| **IBGE**          | População (Censo 2022 + Estimativas)    | 2017-2025 |
+| **SNIS/SINISA**   | Água, Esgoto, Tarifas                   | 2017-2023 |
+| **DATASUS (SIH)** | Internações hospitalares (CIDs A00-A09) | 2017-2025 |
+| **INMET**         | Dados climáticos históricos             | 2017-2023 |
+
+### 🏙️ Municípios Monitorados
+
+1. Belém
+2. Ananindeua
+3. Benevides
+4. Castanhal
+5. Marituba
+6. Santa Bárbara do Pará
+7. Santa Izabel do Pará
+
+---
+
+## 🚀 Como Rodar Localmente
+
+### Requisitos
+
+- Navegador web moderno (Chrome, Firefox, Edge)
+- Servidor HTTP local (opcional)
+
+### Passos
+
+```bash
+# 1. Clone o repositório
+git clone https://github.com/enps2015/iara-data-hub.git
+
+# 2. Entre na pasta
+cd iara-data-hub
+
+# 3. Inicie um servidor local (escolha uma opção)
+
+# Opção A: Python 3
+python -m http.server 8080
+
+# Opção B: Node.js (npx)
+npx serve .
+
+# 4. Abra no navegador
+# http://localhost:8080
+```
+
+---
+
+## 📁 Estrutura do Projeto
+
+```
+iara-data-hub/
+├── index.html              # Página principal
+├── assets/
+│   ├── css/
+│   │   └── styles.css      # Estilos do site
+│   ├── js/
+│   │   ├── main.js         # Lógica principal
+│   │   ├── charts.js       # Visualizações (Chart.js)
+│   │   └── data.js         # Utilitários de dados
+│   └── data/
+│       └── iara_municipios_rmb.json  # Dados consolidados
+├── img/                    # Imagens do site
+└── README.md
+```
+
+---
+
+## 🔄 Como Atualizar os Dados
+
+1. Edite o arquivo `assets/data/iara_municipios_rmb.json`
+2. Adicione novos registros seguindo o formato:
+
+```json
+{
+  "municipio": "Belém (PA)",
+  "ano": 2024,
+  "populacao": 1500000,
+  "cobertura_agua": 85.5,
+  "coleta_esgoto": 22.3,
+  "internacoes_hidricas_total": 450,
+  "taxa_internacoes_hidricas_10k": 3.0,
+  "risco_climatico": 0.85
+}
+```
+
+3. Os gráficos serão atualizados automaticamente ao recarregar a página.
+
+---
+
+## 🌐 Deploy no GitHub Pages
+
+### Passos para Publicar
+
+1. Faça push do código para o repositório GitHub
+2. Vá em **Settings → Pages**
+3. Em "Source", selecione **Deploy from a branch**
+4. Escolha a branch `main` e pasta `/ (root)`
+5. Clique em **Save**
+6. O site estará disponível em: `https://seu-usuario.github.io/iara-data-hub/`
+
+---
+
+## 🛠️ Tecnologias
+
+- **HTML5 / CSS3** - Estrutura e estilos
+- **JavaScript ES6+** - Lógica e interatividade
+- **Chart.js** - Gráficos interativos
+- **Font Awesome** - Ícones
+- **Google Fonts (Outfit)** - Tipografia
+
+---
+
+## 📜 Licença
+
+Este projeto está sob a licença **Creative Commons BY 4.0**.
+
+Uso livre com atribuição ao autor.
+
+---
+
+## 👤 Autor
+
+**Eric Pimentel**  
+Engenheiro, Cientista de Dados e pesquisador em Inteligência Artificial aplicada à Sustentabilidade.
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ericpimentel-dados/)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/enps2015)
+
+---
+
+## 🙏 Agradecimentos
+
+- Instituto I2A2 pela mentoria
+- SNIS e DATASUS pelos dados públicos
+- Comunidade open-source pelas ferramentas
+
+---
+
+_Desenvolvido com dados públicos e auxílio de ferramentas de Inteligência Artificial._
+_© 2025 IARA Data Hub_
