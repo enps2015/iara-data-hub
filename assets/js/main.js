@@ -564,7 +564,8 @@ function renderComparisonBars(municipality, record2023) {
     );
     const healthPop = healthData.reduce((s, d) => s + d.populacao, 0);
     const totalCases = healthData.reduce((s, d) => s + d.internacoes_hidricas_total, 0);
-    const rmbIntern = healthPop > 0 ? (totalCases / healthPop) * 10000 : null;
+    const healthCoverageComplete = data2023.length > 0 && healthData.length === data2023.length;
+    const rmbIntern = healthPop > 0 && healthCoverageComplete ? (totalCases / healthPop) * 10000 : null;
 
     const munAgua = record2023?.cobertura_agua ?? null;
     const munEsgoto = record2023?.coleta_esgoto ?? null;
@@ -573,7 +574,7 @@ function renderComparisonBars(municipality, record2023) {
     const bars = [
         { label: 'Água', value: munAgua, max: 100, rmb: rmbAgua, color: 'cyan' },
         { label: 'Esgoto', value: munEsgoto, max: 100, rmb: rmbEsgoto, color: 'cyan' },
-        { label: 'Internações', value: munIntern, max: 40, rmb: rmbIntern, color: 'magenta' }
+        { label: 'CID A00–A09/10k', value: munIntern, max: 40, rmb: rmbIntern, color: 'magenta', isRate: true }
     ];
     
     container.innerHTML = bars.map(bar => {
@@ -586,7 +587,7 @@ function renderComparisonBars(municipality, record2023) {
             : '';
         const compColor = !hasValue || !hasReference
             ? 'var(--text-light-muted)'
-            : (bar.label === 'Internações'
+            : (bar.isRate
                 ? (bar.value > bar.rmb ? '#ec4899' : '#a3e635')
                 : (bar.value > bar.rmb ? '#a3e635' : '#ec4899'));
 
@@ -598,7 +599,7 @@ function renderComparisonBars(municipality, record2023) {
                     ${hasReference ? `<div title="Referência RMB: ${bar.rmb.toFixed(1)}" style="position: absolute; left: ${rmbWidth}%; top: 0; bottom: 0; width: 2px; background: #fbbf24; opacity: 0.8;"></div>` : ''}
                 </div>
                 <span class="comparison-bar-value" style="color: ${compColor}">
-                    ${hasValue ? `${bar.value.toFixed(1)}${bar.label !== 'Internações' ? '%' : ''}` : 'N/D'} ${comparison}
+                    ${hasValue ? `${bar.value.toFixed(1)}${bar.isRate ? '' : '%'}` : 'N/D'} ${comparison}
                 </span>
             </div>
         `;
