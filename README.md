@@ -105,10 +105,12 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 
 | Fonte             | Dados                                   | Período   |
 | ----------------- | --------------------------------------- | --------- |
-| **IBGE**          | População (Censo 2022 + Estimativas)    | 2017-2025 |
-| **SNIS/SINISA**   | Água, Esgoto, Tarifas                   | 2017-2023 |
+| **IBGE / FAPESPA** | Estimativas anuais de população (2017–2021); 2022–2025 em revisão de proveniência | 2017–2025* |
+| **SNIS**          | Água, Esgoto, Tarifas                   | 2017–2023 |
 | **DATASUS (SIH)** | Internações hospitalares (CIDs A00-A09) | 2017-2025 |
 | **INMET**         | Dados climáticos históricos             | 2017-2023 |
+
+*A série de população de 2022–2025 ainda requer reconciliação por fonte e referência temporal.*
 
 ### 🏙️ Municípios Monitorados
 
@@ -176,6 +178,8 @@ iara-data-hub/
 ---
 
 ## 🧪 Qualidade dos dados e testes
+
+Consulte o [registro de proveniência, cobertura e limitações por indicador](docs/data-provenance.md) antes de interpretar tendências ou reutilizar as séries. As estimativas de população de 2017–2021 foram reconciliadas com a tabela FAPESPA/IBGE; 2022–2025 continuam em revisão.
 
 Valores ausentes nos indicadores são preservados como `null` e apresentados como **N/D**. Um zero numérico válido continua sendo zero. O parser não deve preencher lacunas com zero, porque isso distorce médias, rankings e comparações entre municípios.
 
