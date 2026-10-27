@@ -30,11 +30,26 @@ Para esses anos, `taxa_internacoes_hidricas_10k` foi recalculada pela expressão
 
 A correção ajusta o denominador populacional e a taxa matemática derivada. **Não valida os totais de internações**: a extração SIH/DATASUS, os arquivos de entrada e os filtros ainda precisam ser reproduzidos e auditados.
 
-### Situação de 2022–2025
+### Reconciliação de 2022–2025
 
-Os registros de população de 2022–2025 permanecem em revisão de proveniência. A versão anterior de `scripts/patch_data.py` aplicava um único mapa populacional a 2023 e preenchia qualquer outro ano com população zero usando os mesmos números. Essa regra foi removida. O script atualizado trabalha exclusivamente com os anos 2017–2021 cobertos pela fonte citada e deixa anos posteriores intocados.
+A população de 2022–2025 foi reconciliada a partir de publicações oficiais. As referências temporais não são equivalentes:
 
-Não reutilizar valores censitários ou de um ano para preencher outro ano sem registrar fonte, referência temporal e método. As estimativas anuais e os resultados censitários precisam ser identificados como conceitos distintos.
+- **2022 — Censo Demográfico:** valores do Censo 2022 conforme as páginas atuais do IBGE Cidades e Estados: [Ananindeua](https://www.ibge.gov.br/cidades-e-estados/pa/ananindeua.html), [Belém](https://www.ibge.gov.br/cidades-e-estados/pa/belem.html), [Benevides](https://www.ibge.gov.br/cidades-e-estados/pa/benevides.html), [Castanhal](https://www.ibge.gov.br/cidades-e-estados/pa/castanhal.html), [Marituba](https://www.ibge.gov.br/cidades-e-estados/pa/marituba.html), [Santa Bárbara do Pará](https://www.ibge.gov.br/cidades-e-estados/pa/santa-barbara-do-para.html) e [Santa Izabel do Pará](https://www.ibge.gov.br/cidades-e-estados/pa/santa-izabel-do-para.html).
+- **2023 — valor de referência transportado:** a FAPESPA informa que repetiu para 2023 os valores de 2022 porque o IBGE não calculou estimativas populacionais municipais para 2023. Assim, os números de 2023 neste conjunto **não são estimativas independentes nem contagens realizadas em 2023**; repetem a população censitária de 2022 como denominador de referência para manter a taxa calculável. Fonte: [FAPESPA, tabela de população 2020–2024 e nota metodológica](https://www.fapespa.pa.gov.br/sistemas/anuario2024/tabelas/demografia/tab-1.1-populacao-total-estimativas-populacionais-e-censo-deografico-2020-a-2024.htm).
+- **2024 — estimativas populacionais do IBGE**, divulgadas pela FAPESPA com referência em 1º de julho de 2024: [tabela FAPESPA 2020–2024](https://www.fapespa.pa.gov.br/sistemas/anuario2024/tabelas/demografia/tab-1.1-populacao-total-estimativas-populacionais-e-censo-deografico-2020-a-2024.htm).
+- **2025 — estimativas populacionais do IBGE**, referência em 1º de julho de 2025, usando a versão atualizada do arquivo em 28 de agosto de 2026: [POP2025_20260828.pdf](https://ftp.ibge.gov.br/Estimativas_de_Populacao/Estimativas_2025/POP2025_20260828.pdf).
+
+| Município | 2022 — Censo | 2023 — repetição de 2022 | 2024 — estimativa | 2025 — estimativa |
+|---|---:|---:|---:|---:|
+| Ananindeua | 478.778 | 478.778 | 507.838 | 509.227 |
+| Belém | 1.303.403 | 1.303.403 | 1.398.531 | 1.397.315 |
+| Benevides | 63.567 | 63.567 | 68.191 | 68.962 |
+| Castanhal | 192.256 | 192.256 | 207.603 | 209.126 |
+| Marituba | 111.785 | 111.785 | 118.998 | 119.437 |
+| Santa Bárbara do Pará | 21.087 | 21.087 | 22.288 | 22.530 |
+| Santa Izabel do Pará | 73.019 | 73.019 | 78.317 | 79.195 |
+
+O CSV foi atualizado com os valores acima e a coluna **taxa_internacoes_hidricas_10k** foi recalculada para os anos correspondentes pela fórmula **internacoes_hidricas_total / populacao × 10.000**. A alteração não muda os totais de internações nem valida sua proveniência.
 
 ## Saneamento
 

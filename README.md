@@ -46,7 +46,7 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 - **Lacunas de dados**: a série consolidada abrange 2017–2025, mas a disponibilidade varia conforme o indicador e o ano. Em 2023, três dos sete municípios não têm coleta de esgoto informada; comparações entre indicadores devem usar apenas registros compatíveis e informar a cobertura efetiva.
 - **Diferenças entre municípios**: as visualizações permitem comparar padrões observados na Região Metropolitana de Belém. A classificação em quadrantes ou zonas é relativa aos dados e critérios escolhidos, não um diagnóstico absoluto de qualidade sanitária.
 
-**Nota de proveniência temporal:** a documentação atual informa que os indicadores de saneamento têm dados observados até 2023 e menciona projeções para 2024–2025, enquanto a tabela de fontes apresenta uma série consolidada até 2025. Antes de interpretar tendências nesses anos, é necessário documentar, por indicador, o que é observado, estimado ou projetado, com a fonte e o método correspondentes. Essa reconciliação está pendente; não se deve presumir que todos os valores de 2017–2025 tenham a mesma origem ou condição de observação.
+**Nota de proveniência temporal:** a série populacional foi reconciliada com estimativas oficiais de 2017–2021, população censitária de 2022, repetição declarada desse valor em 2023 e estimativas oficiais de 2024–2025. A cobertura de saneamento é uma questão separada: os indicadores correspondentes estão ausentes em 2017, 2018, 2024 e 2025 no CSV atual; esses campos ausentes não devem ser interpretados como projeções nem como zero.
 
 ### Insights visuais:
 
@@ -62,7 +62,7 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 
 - **Inconsistência entre fontes**: Dados do SNIS e IBGE usam metodologias diferentes
 - **Lacunas temporais**: Muitos municípios simplesmente não reportam dados em certos anos
-- **Defasagem**: Dados de saneamento mais recentes são de 2023; 2024-2025 ainda são projeções
+- **Defasagem**: O CSV atual não contém indicadores de saneamento para 2017, 2018, 2024 e 2025; não há base documentada para tratá-los como projeções.
 
 ### Técnicas:
 
@@ -105,12 +105,12 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 
 | Fonte             | Dados                                   | Período   |
 | ----------------- | --------------------------------------- | --------- |
-| **IBGE / FAPESPA** | Estimativas anuais de população (2017–2021); 2022–2025 em revisão de proveniência | 2017–2025* |
+| **IBGE / FAPESPA** | Estimativas anuais (2017–2021), Censo (2022), referência transportada (2023), estimativas (2024–2025) | 2017–2025 |
 | **SNIS**          | Água, Esgoto, Tarifas                   | 2017–2023 |
 | **DATASUS (SIH)** | Internações hospitalares (CIDs A00-A09) | 2017-2025 |
 | **INMET**         | Dados climáticos históricos             | 2017-2023 |
 
-*A série de população de 2022–2025 ainda requer reconciliação por fonte e referência temporal.*
+*Nota: 2023 repete a população censitária de 2022 como denominador de referência, pois a FAPESPA informa que não houve estimativa municipal do IBGE para 2023. Consulte [a proveniência e as fontes](docs/data-provenance.md).*
 
 ### 🏙️ Municípios Monitorados
 
@@ -179,7 +179,7 @@ iara-data-hub/
 
 ## 🧪 Qualidade dos dados e testes
 
-Consulte o [registro de proveniência, cobertura e limitações por indicador](docs/data-provenance.md) antes de interpretar tendências ou reutilizar as séries. As estimativas de população de 2017–2021 foram reconciliadas com a tabela FAPESPA/IBGE; 2022–2025 continuam em revisão.
+Consulte o [registro de proveniência, cobertura e limitações por indicador](docs/data-provenance.md) antes de interpretar tendências ou reutilizar as séries. A população de 2017–2025 usa fontes documentadas; 2023 é explicitamente identificado como repetição do Censo 2022, não como estimativa independente.
 
 Valores ausentes nos indicadores são preservados como `null` e apresentados como **N/D**. Um zero numérico válido continua sendo zero. O parser não deve preencher lacunas com zero, porque isso distorce médias, rankings e comparações entre municípios.
 
