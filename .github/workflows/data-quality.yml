@@ -6,6 +6,7 @@ on:
     paths:
       - "assets/js/**"
       - "data/iara/iara_municipios_rmb.csv"
+      - "data/iara/iara_municipios_rmb.json"
       - "tests/**"
       - ".github/workflows/data-quality.yml"
   pull_request:
