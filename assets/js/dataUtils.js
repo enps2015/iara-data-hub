@@ -35,7 +35,7 @@ const DataUtils = {
             const report = this.getLastParseReport();
 
             console.info(
-                `IARA Data Hub: ${report.rowCount} registros, ${report.missingCells} células ausentes preservadas como N/D.`
+                `IARA Data Hub: ${report.rowCount} registros, ${report.missingCells} células ausentes e ${report.invalidCells} valores inválidos preservados como N/D.`
             );
             if (report.invalidValues.length > 0) {
                 console.warn('Valores numéricos inválidos convertidos em N/D:', report.invalidValues);
@@ -135,6 +135,7 @@ const DataUtils = {
         const missingByColumn = Object.fromEntries(headers.map(header => [header, 0]));
         const invalidValues = [];
         let missingCells = 0;
+        let invalidCells = 0;
         let rowsWithMissing = 0;
 
         const records = rows.slice(1).map((values, index) => {
@@ -167,7 +168,7 @@ const DataUtils = {
                         entry[header] = null;
                         invalidValues.push({ row: rowNumber, column: header, value: raw });
                         missingByColumn[header] += 1;
-                        missingCells += 1;
+                        invalidCells += 1;
                         rowHasMissing = true;
                     } else {
                         entry[header] = value;
@@ -186,6 +187,7 @@ const DataUtils = {
             columnCount: headers.length,
             headers,
             missingCells,
+            invalidCells,
             rowsWithMissing,
             missingByColumn,
             invalidValues
