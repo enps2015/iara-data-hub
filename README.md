@@ -50,8 +50,8 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 
 ### Insights visuais:
 
-- O **Mapa da Injustiça Hídrica** compara coleta de esgoto e internações usando medianas dos registros completos. O quadrante mais favorável é relativo aos municípios observados e não significa, por si só, que a situação sanitária seja ideal em termos absolutos.
-- A **Linha do Tempo** revela se a aceleração de obras (2019-2023) impactou a curva de internações
+- O **Mapa da Injustiça Hídrica** compara coleta de esgoto e internações usando medianas dos registros completos. O quadrante é relativo aos municípios observados; correlação visual não demonstra causalidade e os totais SIH continuam em auditoria.
+- A **Linha do Tempo** permite inspecionar a co-variação das séries disponíveis (2019–2023), mas não estima impacto causal das obras.
 - A **Matriz de Dados** expõe quanto da gestão pública é feita "no escuro", sem informações básicas
 
 ---
@@ -109,6 +109,8 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 | **SNIS**          | Água, Esgoto, Tarifas                   | 2017–2023 |
 | **DATASUS (SIH)** | Internações hospitalares por diagnóstico principal CID-10 A00–A09 (doenças intestinais infecciosas; via de transmissão não inferida) | 2017–2025* |
 | **INMET**         | Dados climáticos históricos             | 2017-2023 |
+
+* O intervalo é o da série consolidada. A cobertura mensal/anual dos arquivos SIH ainda não foi comprovada; contagens e taxas permanecem em auditoria até que os arquivos de origem sejam conferidos.
 
 *Nota: 2023 repete a população censitária de 2022 como denominador de referência, pois a FAPESPA informa que não houve estimativa municipal do IBGE para 2023. Consulte [a proveniência e as fontes](docs/data-provenance.md).*
 
