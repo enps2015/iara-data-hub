@@ -15,9 +15,14 @@ const Charts = {
         
         const data2023 = DataUtils.filterByYear(data, 2023);
         
-        // Calcular medianas para quadrantes
-        const esgotoValues = data2023.map(d => d.coleta_esgoto || 0).filter(v => v > 0);
-        const internValues = data2023.map(d => d.taxa_internacoes_hidricas_10k || 0).filter(v => v > 0);
+        // Usar apenas observações com os dois indicadores disponíveis.
+        // Ausência de dado não equivale a cobertura ou internação igual a zero.
+        const completeCases = data2023.filter(d =>
+            DataUtils.isAvailableNumber(d.coleta_esgoto) &&
+            DataUtils.isAvailableNumber(d.taxa_internacoes_hidricas_10k)
+        );
+        const esgotoValues = completeCases.map(d => d.coleta_esgoto);
+        const internValues = completeCases.map(d => d.taxa_internacoes_hidricas_10k);
         
         const medianEsgoto = esgotoValues.length > 0 
             ? esgotoValues.sort((a,b) => a-b)[Math.floor(esgotoValues.length/2)] 
@@ -26,10 +31,12 @@ const Charts = {
             ? internValues.sort((a,b) => a-b)[Math.floor(internValues.length/2)] 
             : 5;
         
-        const scatterData = data2023.map(d => ({
-            x: d.coleta_esgoto || 0,
-            y: d.taxa_internacoes_hidricas_10k || 0,
-            r: Math.max(Math.sqrt(d.populacao || 10000) / 25, 8),
+        const scatterData = completeCases.map(d => ({
+            x: d.coleta_esgoto,
+            y: d.taxa_internacoes_hidricas_10k,
+            r: DataUtils.isAvailableNumber(d.populacao) && d.populacao > 0
+                ? Math.max(Math.sqrt(d.populacao) / 25, 8)
+                : 8,
             municipio: d.municipio.split('(')[0].trim(),
             populacao: d.populacao
         }));
@@ -74,7 +81,7 @@ const Charts = {
                                     `${p.municipio}`,
                                     `Esgoto: ${p.x.toFixed(1)}%`,
                                     `Internações: ${p.y.toFixed(1)}/10k`,
-                                    `Pop: ${(p.populacao/1000).toFixed(0)}k`
+                                    `População: ${DataUtils.isAvailableNumber(p.populacao) ? (p.populacao / 1000).toFixed(0) + 'k' : 'N/D'}`
                                 ];
                             }
                         }
@@ -130,7 +137,7 @@ const Charts = {
                                 type: 'label',
                                 xValue: 5,
                                 yValue: 12,
-                                content: ['⚠️ ZONA CRÍTICA', 'Baixa coleta + Alta doença'],
+                                content: ['⚠️ ALERTA RELATIVO', 'Coleta abaixo da mediana', 'Internações acima da mediana'],
                                 backgroundColor: 'rgba(236, 72, 153, 0.2)',
                                 color: '#ec4899',
                                 font: { size: 10, weight: 'bold' },
@@ -141,7 +148,7 @@ const Charts = {
                                 type: 'label',
                                 xValue: 40,
                                 yValue: 2,
-                                content: ['✓ ZONA IDEAL', 'Alta coleta + Baixa doença'],
+                                content: ['✓ QUADRANTE FAVORÁVEL', 'Coleta acima da mediana', 'Internações abaixo da mediana'],
                                 backgroundColor: 'rgba(34, 211, 238, 0.2)',
                                 color: '#22d3ee',
                                 font: { size: 10, weight: 'bold' },
@@ -193,16 +200,25 @@ const Charts = {
         // Agregados da RMB por ano
         const internTrend = years.map(year => {
             const yearData = DataUtils.filterByYear(data, year);
-            const totalPop = yearData.reduce((sum, d) => sum + (d.populacao || 0), 0);
-            const totalCases = yearData.reduce((sum, d) => sum + (d.internacoes_hidricas_total || 0), 0);
-            return totalPop > 0 ? (totalCases / totalPop) * 10000 : null;
+            const healthData = yearData.filter(d =>
+                DataUtils.isAvailableNumber(d.populacao) &&
+                d.populacao > 0 &&
+                DataUtils.isAvailableNumber(d.internacoes_hidricas_total)
+            );
+            const totalPop = healthData.reduce((sum, d) => sum + d.populacao, 0);
+            const totalCases = healthData.reduce((sum, d) => sum + d.internacoes_hidricas_total, 0);
+            return healthData.length > 0 && totalPop > 0 ? (totalCases / totalPop) * 10000 : null;
         });
         
         const esgotoTrend = years.map(year => {
-            const yearData = DataUtils.filterByYear(data, year).filter(d => d.coleta_esgoto > 0);
+            const yearData = DataUtils.filterByYear(data, year).filter(d =>
+                DataUtils.isAvailableNumber(d.coleta_esgoto) &&
+                DataUtils.isAvailableNumber(d.populacao) &&
+                d.populacao > 0
+            );
             if (yearData.length === 0) return null;
-            const totalPop = yearData.reduce((s, d) => s + (d.populacao || 0), 0);
-            const weighted = yearData.reduce((s, d) => s + (d.coleta_esgoto * (d.populacao || 0)), 0);
+            const totalPop = yearData.reduce((s, d) => s + d.populacao, 0);
+            const weighted = yearData.reduce((s, d) => s + (d.coleta_esgoto * d.populacao), 0);
             return totalPop > 0 ? weighted / totalPop : null;
         });
 
@@ -361,7 +377,10 @@ const Charts = {
             years.forEach(y => {
                 totalCells++;
                 const record = data.find(d => d.municipio === mun && d.ano === y);
-                const hasData = record && (record.cobertura_agua > 0 || record.coleta_esgoto > 0);
+                const hasData = record && (
+                    DataUtils.isAvailableNumber(record.cobertura_agua) ||
+                    DataUtils.isAvailableNumber(record.coleta_esgoto)
+                );
                 
                 if (hasData) {
                     cellsWithData++;
@@ -370,8 +389,8 @@ const Charts = {
                 }
                 
                 const cellClass = hasData ? 'has-data' : 'no-data';
-                const title = hasData 
-                    ? `${cityName} ${y}: Água ${(record.cobertura_agua||0).toFixed(0)}%, Esgoto ${(record.coleta_esgoto||0).toFixed(0)}%`
+                const title = hasData
+                    ? `${cityName} ${y}: Água ${DataUtils.formatNumber(record.cobertura_agua, 0, '%')}, Esgoto ${DataUtils.formatNumber(record.coleta_esgoto, 0, '%')}`
                     : `${cityName} ${y}: SEM DADOS - Gestão no escuro`;
                 
                 html += `<td class="p-2"><div class="matrix-cell ${cellClass}" title="${title}"></div></td>`;
@@ -410,7 +429,7 @@ const Charts = {
             data: {
                 labels: dataPoints.map((_, i) => i),
                 datasets: [{
-                    data: dataPoints,
+                    data: dataPoints.map(value => DataUtils.isAvailableNumber(value) ? value : null),
                     borderColor: '#ec4899',
                     borderWidth: 2,
                     pointRadius: 0,

@@ -18,8 +18,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         // Load data
         globalData = await DataUtils.loadData();
+        const qualityReport = DataUtils.getLastParseReport();
+        renderDataQualityNotice(qualityReport, DataUtils.getLastLoadError());
         console.log('📊 Dados carregados:', globalData.length, 'registros');
-        
+
+        if (globalData.length === 0) {
+            console.error('IARA Data Hub interrompido: não há registros válidos para renderizar.');
+            return;
+        }
+
         // Initialize all components
         initKPIs(globalData);
         Charts.renderInjustica(globalData);
@@ -38,6 +45,53 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // ============================================
+// DATA QUALITY NOTICE
+// ============================================
+function renderDataQualityNotice(report, loadError) {
+    const notice = document.createElement('aside');
+    notice.id = 'data-quality-notice';
+    notice.setAttribute('role', loadError ? 'alert' : 'status');
+    notice.style.cssText = [
+        'max-width: 1200px',
+        'margin: 1rem auto',
+        'padding: 0.9rem 1.1rem',
+        'border: 1px solid rgba(103, 232, 249, 0.35)',
+        'border-radius: 12px',
+        'background: rgba(8, 24, 38, 0.94)',
+        'color: #d7e5ee',
+        'font-size: 0.9rem',
+        'line-height: 1.55'
+    ].join(';');
+
+    if (loadError || !report) {
+        notice.style.borderColor = 'rgba(248, 113, 113, 0.65)';
+        notice.textContent = `Não foi possível carregar os dados do observatório. ${loadError || 'Verifique o CSV e tente novamente.'}`;
+    } else if (report.invalidCells > 0 || report.missingCells > 0) {
+        const year2023 = globalData.filter(record => record.ano === 2023);
+        const completeComparisons2023 = year2023.filter(record =>
+            DataUtils.isAvailableNumber(record.coleta_esgoto) &&
+            DataUtils.isAvailableNumber(record.taxa_internacoes_hidricas_10k)
+        ).length;
+        const comparisonNote = year2023.length > 0
+            ? ` <strong>${completeComparisons2023} de ${year2023.length}</strong> registros de 2023 têm coleta de esgoto e taxa de internações simultaneamente disponíveis; o gráfico de dispersão usa apenas essas observações.`
+            : '';
+        if (report.invalidCells > 0) {
+            notice.innerHTML = `<strong style="color:#fbbf24">Qualidade dos dados:</strong> ${report.rowCount} registros carregados. ${report.missingCells} células vazias e ${report.invalidCells} valores inválidos estão preservados como <code>N/D</code>, sem serem convertidos em zero.${comparisonNote}`;
+        } else {
+            notice.innerHTML = `<strong style="color:#67e8f9">Transparência dos dados:</strong> ${report.rowCount} registros carregados. ${report.missingCells} células sem informação são exibidas como <code>N/D</code>; valores ausentes não são tratados como zero.${comparisonNote}`;
+        }
+    }
+
+    if (!loadError && report && report.missingCells === 0 && report.invalidCells === 0) return;
+    const header = document.querySelector('.header');
+    if (header && header.parentNode) {
+        header.insertAdjacentElement('afterend', notice);
+    } else {
+        document.body.prepend(notice);
+    }
+}
+
+// ============================================
 // KPIs - Médias Ponderadas 2023
 // ============================================
 function initKPIs(data) {
@@ -49,29 +103,38 @@ function initKPIs(data) {
     }
     
     // Calcular médias ponderadas por população
-    const totalPop = data2023.reduce((s, d) => s + (d.populacao || 0), 0);
-    
-    // Cobertura de água (ponderada)
-    const aguaData = data2023.filter(d => d.cobertura_agua > 0);
-    const aguaPop = aguaData.reduce((s, d) => s + (d.populacao || 0), 0);
-    const aguaWeighted = aguaData.reduce((s, d) => s + (d.cobertura_agua * (d.populacao || 0)), 0);
-    const aguaAvg = aguaPop > 0 ? (aguaWeighted / aguaPop) : 0;
-    
-    // Coleta de esgoto (ponderada)
-    const esgotoData = data2023.filter(d => d.coleta_esgoto > 0);
-    const esgotoPop = esgotoData.reduce((s, d) => s + (d.populacao || 0), 0);
-    const esgotoWeighted = esgotoData.reduce((s, d) => s + (d.coleta_esgoto * (d.populacao || 0)), 0);
-    const esgotoAvg = esgotoPop > 0 ? (esgotoWeighted / esgotoPop) : 0;
-    
-    // Taxa de internações (agregada)
-    const totalCases = data2023.reduce((s, d) => s + (d.internacoes_hidricas_total || 0), 0);
-    const taxaAvg = totalPop > 0 ? (totalCases / totalPop) * 10000 : 0;
-    
-    // Risco climático (média simples)
-    const riscoData = data2023.filter(d => d.risco_climatico > 0);
-    const riscoAvg = riscoData.length > 0 
-        ? riscoData.reduce((s, d) => s + d.risco_climatico, 0) / riscoData.length 
-        : 0;
+    // Cada indicador é agregado somente sobre registros com valor conhecido.
+    const aguaData = data2023.filter(d =>
+        DataUtils.isAvailableNumber(d.cobertura_agua) &&
+        DataUtils.isAvailableNumber(d.populacao) &&
+        d.populacao > 0
+    );
+    const aguaPop = aguaData.reduce((s, d) => s + d.populacao, 0);
+    const aguaWeighted = aguaData.reduce((s, d) => s + (d.cobertura_agua * d.populacao), 0);
+    const aguaAvg = aguaPop > 0 ? aguaWeighted / aguaPop : null;
+
+    const esgotoData = data2023.filter(d =>
+        DataUtils.isAvailableNumber(d.coleta_esgoto) &&
+        DataUtils.isAvailableNumber(d.populacao) &&
+        d.populacao > 0
+    );
+    const esgotoPop = esgotoData.reduce((s, d) => s + d.populacao, 0);
+    const esgotoWeighted = esgotoData.reduce((s, d) => s + (d.coleta_esgoto * d.populacao), 0);
+    const esgotoAvg = esgotoPop > 0 ? esgotoWeighted / esgotoPop : null;
+
+    const healthData = data2023.filter(d =>
+        DataUtils.isAvailableNumber(d.internacoes_hidricas_total) &&
+        DataUtils.isAvailableNumber(d.populacao) &&
+        d.populacao > 0
+    );
+    const healthPop = healthData.reduce((s, d) => s + d.populacao, 0);
+    const totalCases = healthData.reduce((s, d) => s + d.internacoes_hidricas_total, 0);
+    const taxaAvg = healthPop > 0 ? (totalCases / healthPop) * 10000 : null;
+
+    const riscoData = data2023.filter(d => DataUtils.isAvailableNumber(d.risco_climatico));
+    const riscoAvg = riscoData.length > 0
+        ? riscoData.reduce((s, d) => s + d.risco_climatico, 0) / riscoData.length
+        : null;
     
     // Animate KPIs
     animateValue('kpi-water', 0, aguaAvg, 1500, '%');
@@ -83,7 +146,11 @@ function initKPIs(data) {
 function animateValue(elementId, start, end, duration, suffix) {
     const element = document.getElementById(elementId);
     if (!element) return;
-    
+    if (!DataUtils.isAvailableNumber(end)) {
+        element.textContent = 'N/D';
+        return;
+    }
+
     const startTime = performance.now();
     
     function update(currentTime) {
@@ -132,24 +199,26 @@ function renderMunicipalityCards(data) {
         const bgImage = cityImages[cityName] || 'img/belem_vista_do_rio02.png';
         
         // Values
-        const aguaVal = record2023?.cobertura_agua || 0;
-        const esgotoVal = record2023?.coleta_esgoto || 0;
-        const internVal = record2023?.taxa_internacoes_hidricas_10k || 0;
-        
-        // Sparkline data
-        const sparkData = munData.map(d => d.taxa_internacoes_hidricas_10k || 0);
+        const aguaVal = record2023?.cobertura_agua ?? null;
+        const esgotoVal = record2023?.coleta_esgoto ?? null;
+        const internVal = record2023?.taxa_internacoes_hidricas_10k ?? null;
+
+        // Valores ausentes ficam como null para o gráfico interromper a linha.
+        const sparkData = munData.map(d => d.taxa_internacoes_hidricas_10k ?? null);
         const canvasId = `spark-${index}`;
         
         // Generate insight phrase
         let insight = '';
-        if (aguaVal > 80 && internVal > 5) {
+        if (DataUtils.isAvailableNumber(aguaVal) && DataUtils.isAvailableNumber(internVal) && aguaVal > 80 && internVal > 5) {
             insight = `Mesmo com ${aguaVal.toFixed(0)}% de água, as internações seguem em ${internVal.toFixed(1)}/10k hab.`;
-        } else if (esgotoVal < 5) {
-            insight = `Apenas ${esgotoVal.toFixed(1)}% de coleta de esgoto. Prioridade crítica.`;
-        } else if (internVal > 6) {
+        } else if (DataUtils.isAvailableNumber(esgotoVal) && esgotoVal < 5) {
+            insight = `A coleta de esgoto registrada é ${esgotoVal.toFixed(1)}%. Avalie o contexto e a cobertura dos dados.`;
+        } else if (DataUtils.isAvailableNumber(internVal) && internVal > 6) {
             insight = `Taxa de internação de ${internVal.toFixed(1)}/10k hab indica pressão no sistema de saúde.`;
+        } else if (!DataUtils.isAvailableNumber(aguaVal) || !DataUtils.isAvailableNumber(esgotoVal) || !DataUtils.isAvailableNumber(internVal)) {
+            insight = 'Há indicadores sem informação em 2023. Consulte a matriz de cobertura antes de comparar municípios.';
         } else {
-            insight = `Dados de 2023. Monitoramento contínuo necessário.`;
+            insight = 'Dados de 2023 disponíveis. Monitoramento contínuo necessário.';
         }
 
         // Render sparkline after DOM update
@@ -164,11 +233,11 @@ function renderMunicipalityCards(data) {
                 <div class="municipality-body">
                     <div class="municipality-metrics">
                         <div class="metric">
-                            <div class="metric-value cyan">${aguaVal.toFixed(1)}%</div>
+                            <div class="metric-value cyan">${DataUtils.formatNumber(aguaVal, 1, '%')}</div>
                             <div class="metric-label">Água</div>
                         </div>
                         <div class="metric">
-                            <div class="metric-value magenta">${esgotoVal.toFixed(1)}%</div>
+                            <div class="metric-value magenta">${DataUtils.formatNumber(esgotoVal, 1, '%')}</div>
                             <div class="metric-label">Esgoto</div>
                         </div>
                     </div>
@@ -236,14 +305,10 @@ function openModal(municipality) {
     document.getElementById('modalSubtitle').textContent = `Série histórica completa: ${munData.length} anos de dados`;
     
     // Update KPIs
-    document.getElementById('modalAgua').textContent = record2023?.cobertura_agua ? 
-        `${record2023.cobertura_agua.toFixed(1)}%` : 'N/D';
-    document.getElementById('modalEsgoto').textContent = record2023?.coleta_esgoto ? 
-        `${record2023.coleta_esgoto.toFixed(1)}%` : 'N/D';
-    document.getElementById('modalIntern').textContent = record2023?.taxa_internacoes_hidricas_10k ? 
-        record2023.taxa_internacoes_hidricas_10k.toFixed(1) : 'N/D';
-    document.getElementById('modalRisco').textContent = record2023?.risco_climatico ? 
-        record2023.risco_climatico.toFixed(2) : 'N/D';
+    document.getElementById('modalAgua').textContent = DataUtils.formatNumber(record2023?.cobertura_agua, 1, '%');
+    document.getElementById('modalEsgoto').textContent = DataUtils.formatNumber(record2023?.coleta_esgoto, 1, '%');
+    document.getElementById('modalIntern').textContent = DataUtils.formatNumber(record2023?.taxa_internacoes_hidricas_10k, 1);
+    document.getElementById('modalRisco').textContent = DataUtils.formatNumber(record2023?.risco_climatico, 2);
     
     // Render chart
     renderModalChart(munData);
@@ -293,22 +358,32 @@ function renderQuickReading(cityName, munData, record2023) {
     if (!container) return;
     
     // Find peak internations
-    const peakRecord = munData.filter(d => d.taxa_internacoes_hidricas_10k > 0)
-        .sort((a, b) => (b.taxa_internacoes_hidricas_10k || 0) - (a.taxa_internacoes_hidricas_10k || 0))[0];
+    const peakRecord = munData
+        .filter(d => DataUtils.isAvailableNumber(d.taxa_internacoes_hidricas_10k) && d.taxa_internacoes_hidricas_10k > 0)
+        .sort((a, b) => b.taxa_internacoes_hidricas_10k - a.taxa_internacoes_hidricas_10k)[0];
     
     // Find water trend
-    const agua2019 = munData.find(d => d.ano === 2019)?.cobertura_agua || 0;
-    const agua2023 = record2023?.cobertura_agua || 0;
-    
-    // Calculate RMB average for comparison
+    const agua2019 = munData.find(d => d.ano === 2019)?.cobertura_agua ?? null;
+    const agua2023 = record2023?.cobertura_agua ?? null;
+
+    // Comparar apenas municípios com indicador e população informados.
     const data2023 = DataUtils.filterByYear(globalData, 2023);
-    const rmbEsgotoPop = data2023.filter(d => d.coleta_esgoto > 0);
-    const totalPop = rmbEsgotoPop.reduce((s, d) => s + (d.populacao || 0), 0);
-    const rmbEsgoto = totalPop > 0 ? rmbEsgotoPop.reduce((s, d) => s + (d.coleta_esgoto * (d.populacao || 0)), 0) / totalPop : 0;
-    
-    const esgoto2023 = record2023?.coleta_esgoto || 0;
-    const comparison = esgoto2023 >= rmbEsgoto ? 'acima' : 'abaixo';
-    const compColor = esgoto2023 >= rmbEsgoto ? 'var(--accent-lime)' : 'var(--accent-magenta)';
+    const rmbEsgotoPop = data2023.filter(d =>
+        DataUtils.isAvailableNumber(d.coleta_esgoto) &&
+        DataUtils.isAvailableNumber(d.populacao) &&
+        d.populacao > 0
+    );
+    const totalPop = rmbEsgotoPop.reduce((s, d) => s + d.populacao, 0);
+    const rmbEsgoto = totalPop > 0
+        ? rmbEsgotoPop.reduce((s, d) => s + (d.coleta_esgoto * d.populacao), 0) / totalPop
+        : null;
+
+    const esgoto2023 = record2023?.coleta_esgoto ?? null;
+    const canCompareSewage = DataUtils.isAvailableNumber(esgoto2023) && DataUtils.isAvailableNumber(rmbEsgoto);
+    const comparison = canCompareSewage ? (esgoto2023 >= rmbEsgoto ? 'igual ou acima' : 'abaixo') : null;
+    const compColor = canCompareSewage
+        ? (esgoto2023 >= rmbEsgoto ? 'var(--accent-lime)' : 'var(--accent-magenta)')
+        : 'var(--text-light-muted)';
     
     let html = '<ul style="margin: 0; padding-left: 1rem">';
     
@@ -316,16 +391,22 @@ function renderQuickReading(cityName, munData, record2023) {
         html += `<li><strong>Pico de internações em ${peakRecord.ano}:</strong> ${peakRecord.taxa_internacoes_hidricas_10k.toFixed(1)} por 10 mil hab.</li>`;
     }
     
-    if (agua2019 > 0 && agua2023 > 0) {
+    if (DataUtils.isAvailableNumber(agua2019) && DataUtils.isAvailableNumber(agua2023)) {
         const trend = agua2023 > agua2019 ? 'sobe' : 'cai';
         html += `<li><strong>Cobertura de água ${trend}</strong> de ${agua2019.toFixed(0)}% para ${agua2023.toFixed(0)}% entre 2019 e 2023.</li>`;
     }
     
-    if (esgoto2023 > 0) {
+    if (DataUtils.isAvailableNumber(esgoto2023)) {
         html += `<li>Coleta de esgoto ${esgoto2023 < 50 ? '<strong style="color: var(--accent-magenta)">permanece abaixo de 50%</strong>' : `está em ${esgoto2023.toFixed(0)}%`} em 2023.</li>`;
+    } else {
+        html += '<li>Coleta de esgoto: N/D em 2023; não é possível avaliar esse indicador neste ano.</li>';
     }
-    
-    html += `<li style="margin-top: 0.5rem; color: ${compColor}"><strong>Este município está ${comparison} da média da RMB</strong> em coleta de esgoto.</li>`;
+
+    if (canCompareSewage) {
+        html += `<li style="margin-top: 0.5rem; color: ${compColor}"><strong>Coleta de esgoto deste município está ${comparison} da média calculada com dados disponíveis da RMB.</strong></li>`;
+    } else {
+        html += '<li style="margin-top: 0.5rem">Comparação com a média da RMB indisponível por falta de dados completos.</li>';
+    }
     html += '</ul>';
     
     container.innerHTML = html;
@@ -341,9 +422,9 @@ function renderModalChart(munData) {
     }
     
     const years = munData.map(d => d.ano);
-    const internData = munData.map(d => d.taxa_internacoes_hidricas_10k || null);
-    const aguaData = munData.map(d => d.cobertura_agua || null);
-    const esgotoData = munData.map(d => d.coleta_esgoto || null);
+    const internData = munData.map(d => d.taxa_internacoes_hidricas_10k ?? null);
+    const aguaData = munData.map(d => d.cobertura_agua ?? null);
+    const esgotoData = munData.map(d => d.coleta_esgoto ?? null);
     
     modalChart = new Chart(ctx, {
         type: 'line',
@@ -458,26 +539,35 @@ function renderComparisonBars(municipality, record2023) {
     
     // Calculate RMB averages
     const data2023 = DataUtils.filterByYear(globalData, 2023);
-    const totalPop = data2023.reduce((s, d) => s + (d.populacao || 0), 0);
-    
-    // RMB Água
-    const aguaData = data2023.filter(d => d.cobertura_agua > 0);
-    const aguaPop = aguaData.reduce((s, d) => s + (d.populacao || 0), 0);
-    const rmbAgua = aguaPop > 0 ? aguaData.reduce((s, d) => s + (d.cobertura_agua * (d.populacao || 0)), 0) / aguaPop : 0;
-    
-    // RMB Esgoto
-    const esgotoData = data2023.filter(d => d.coleta_esgoto > 0);
-    const esgotoPop = esgotoData.reduce((s, d) => s + (d.populacao || 0), 0);
-    const rmbEsgoto = esgotoPop > 0 ? esgotoData.reduce((s, d) => s + (d.coleta_esgoto * (d.populacao || 0)), 0) / esgotoPop : 0;
-    
-    // RMB Internações
-    const totalCases = data2023.reduce((s, d) => s + (d.internacoes_hidricas_total || 0), 0);
-    const rmbIntern = totalPop > 0 ? (totalCases / totalPop) * 10000 : 0;
-    
-    // Municipality values
-    const munAgua = record2023?.cobertura_agua || 0;
-    const munEsgoto = record2023?.coleta_esgoto || 0;
-    const munIntern = record2023?.taxa_internacoes_hidricas_10k || 0;
+    const aguaData = data2023.filter(d =>
+        DataUtils.isAvailableNumber(d.cobertura_agua) &&
+        DataUtils.isAvailableNumber(d.populacao) && d.populacao > 0
+    );
+    const aguaPop = aguaData.reduce((s, d) => s + d.populacao, 0);
+    const rmbAgua = aguaPop > 0
+        ? aguaData.reduce((s, d) => s + (d.cobertura_agua * d.populacao), 0) / aguaPop
+        : null;
+
+    const esgotoData = data2023.filter(d =>
+        DataUtils.isAvailableNumber(d.coleta_esgoto) &&
+        DataUtils.isAvailableNumber(d.populacao) && d.populacao > 0
+    );
+    const esgotoPop = esgotoData.reduce((s, d) => s + d.populacao, 0);
+    const rmbEsgoto = esgotoPop > 0
+        ? esgotoData.reduce((s, d) => s + (d.coleta_esgoto * d.populacao), 0) / esgotoPop
+        : null;
+
+    const healthData = data2023.filter(d =>
+        DataUtils.isAvailableNumber(d.internacoes_hidricas_total) &&
+        DataUtils.isAvailableNumber(d.populacao) && d.populacao > 0
+    );
+    const healthPop = healthData.reduce((s, d) => s + d.populacao, 0);
+    const totalCases = healthData.reduce((s, d) => s + d.internacoes_hidricas_total, 0);
+    const rmbIntern = healthPop > 0 ? (totalCases / healthPop) * 10000 : null;
+
+    const munAgua = record2023?.cobertura_agua ?? null;
+    const munEsgoto = record2023?.coleta_esgoto ?? null;
+    const munIntern = record2023?.taxa_internacoes_hidricas_10k ?? null;
     
     const bars = [
         { label: 'Água', value: munAgua, max: 100, rmb: rmbAgua, color: 'cyan' },
@@ -486,22 +576,28 @@ function renderComparisonBars(municipality, record2023) {
     ];
     
     container.innerHTML = bars.map(bar => {
-        const munWidth = Math.min((bar.value / bar.max) * 100, 100);
-        const rmbWidth = Math.min((bar.rmb / bar.max) * 100, 100);
-        const comparison = bar.value > bar.rmb ? '↑' : bar.value < bar.rmb ? '↓' : '=';
-        const compColor = bar.label === 'Internações' ? 
-            (bar.value > bar.rmb ? '#ec4899' : '#a3e635') : 
-            (bar.value > bar.rmb ? '#a3e635' : '#ec4899');
-        
+        const hasValue = DataUtils.isAvailableNumber(bar.value);
+        const hasReference = DataUtils.isAvailableNumber(bar.rmb);
+        const munWidth = hasValue ? Math.min((bar.value / bar.max) * 100, 100) : 0;
+        const rmbWidth = hasReference ? Math.min((bar.rmb / bar.max) * 100, 100) : 0;
+        const comparison = hasValue && hasReference
+            ? (bar.value > bar.rmb ? '↑' : bar.value < bar.rmb ? '↓' : '=')
+            : '';
+        const compColor = !hasValue || !hasReference
+            ? 'var(--text-light-muted)'
+            : (bar.label === 'Internações'
+                ? (bar.value > bar.rmb ? '#ec4899' : '#a3e635')
+                : (bar.value > bar.rmb ? '#a3e635' : '#ec4899'));
+
         return `
             <div class="comparison-bar-item">
                 <span class="comparison-bar-label">${bar.label}</span>
                 <div class="comparison-bar-track">
                     <div class="comparison-bar-fill ${bar.color}" style="width: ${munWidth}%"></div>
-                    <div style="position: absolute; left: ${rmbWidth}%; top: 0; bottom: 0; width: 2px; background: #fbbf24; opacity: 0.8;"></div>
+                    ${hasReference ? `<div title="Referência RMB: ${bar.rmb.toFixed(1)}" style="position: absolute; left: ${rmbWidth}%; top: 0; bottom: 0; width: 2px; background: #fbbf24; opacity: 0.8;"></div>` : ''}
                 </div>
                 <span class="comparison-bar-value" style="color: ${compColor}">
-                    ${bar.value.toFixed(1)}${bar.label !== 'Internações' ? '%' : ''} ${comparison}
+                    ${hasValue ? `${bar.value.toFixed(1)}${bar.label !== 'Internações' ? '%' : ''}` : 'N/D'} ${comparison}
                 </span>
             </div>
         `;

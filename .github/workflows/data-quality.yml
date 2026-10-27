@@ -1,0 +1,42 @@
+name: Qualidade dos dados e sintaxe JavaScript
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "assets/js/**"
+      - "data/iara/iara_municipios_rmb.csv"
+      - "tests/**"
+      - ".github/workflows/data-quality.yml"
+  pull_request:
+    paths:
+      - "assets/js/**"
+      - "data/iara/iara_municipios_rmb.csv"
+      - "tests/**"
+      - ".github/workflows/data-quality.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validar parser, dados e sintaxe
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verificar sintaxe JavaScript
+        run: |
+          node --check assets/js/dataUtils.js
+          node --check assets/js/charts.js
+          node --check assets/js/main.js
+
+      - name: Executar testes do parser e da qualidade de dados
+        run: node --test tests/dataUtils.test.cjs
