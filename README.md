@@ -30,7 +30,7 @@ Traduzir dados públicos dispersos em uma narrativa visual que conecta **saneame
 
 A COP30 trouxe Belém aos holofotes globais como "capital climática". BRT, parques, macrodrenagem e bilhões em fundos verdes foram anunciados. Mas enquanto as manchetes celebravam obras de infraestrutura, uma pergunta permanecia sem resposta:
 
-> **"O que esses investimentos significam para quem ainda convive com esgoto a céu aberto, água intermitente e doenças 100% evitáveis?"**
+> **"O que esses investimentos significam para quem ainda convive com esgoto a céu aberto, água intermitente e infecções cujo risco pode ser reduzido por água segura e saneamento?"**
 
 Como profissional de dados e morador da Amazônia, percebi que **os dados existiam, mas estavam dispersos**. O SNIS tem informações sobre saneamento, o DATASUS sobre internações, o IBGE sobre população — mas ninguém estava conectando esses pontos para contar a história completa.
 
