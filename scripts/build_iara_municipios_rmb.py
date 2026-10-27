@@ -411,7 +411,7 @@ def select_sih_admissions(frame, source_name, seen_aihs=None):
     if parsed_dates.isna().any():
         raise ValueError(
             f"{source_name}: {int(parsed_dates.isna().sum())} internações A00–A09 "
-            "têm data de atendimento inválida."
+            "têm DT_INTER inválida (data de atendimento)."
         )
     years = parsed_dates.dt.year
     if not years.between(1990, 2100).all():
