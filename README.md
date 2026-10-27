@@ -38,11 +38,13 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 
 ## 🔍 O Que Este Projeto Demonstra
 
-### Correlações importantes:
+### Padrões exploratórios a investigar
 
-- **Saneamento × Saúde**: Municípios com menor cobertura de esgoto apresentam maiores taxas de internações por doenças hídricas
-- **Apagão de Dados**: A série de 2017–2025 contém lacunas importantes. Em 2023, três dos sete municípios não têm coleta de esgoto informada; gráficos que relacionam saneamento e internações usam somente registros com ambos os indicadores disponíveis.
-- **Desigualdade Metropolitana**: Enquanto alguns municípios avançam, outros permanecem na "zona crítica" do mapa da injustiça hídrica
+- **Saneamento × Saúde**: o projeto permite explorar associações entre cobertura de esgoto e taxas de internações por doenças hídricas. Esses padrões são descritivos e, por si sós, **não demonstram causalidade**.
+- **Lacunas de dados**: a série consolidada abrange 2017–2025, mas a disponibilidade varia conforme o indicador e o ano. Em 2023, três dos sete municípios não têm coleta de esgoto informada; comparações entre indicadores devem usar apenas registros compatíveis e informar a cobertura efetiva.
+- **Diferenças entre municípios**: as visualizações permitem comparar padrões observados na Região Metropolitana de Belém. A classificação em quadrantes ou zonas é relativa aos dados e critérios escolhidos, não um diagnóstico absoluto de qualidade sanitária.
+
+**Nota de proveniência temporal:** a documentação atual informa que os indicadores de saneamento têm dados observados até 2023 e menciona projeções para 2024–2025, enquanto a tabela de fontes apresenta uma série consolidada até 2025. Antes de interpretar tendências nesses anos, é necessário documentar, por indicador, o que é observado, estimado ou projetado, com a fonte e o método correspondentes. Essa reconciliação está pendente; não se deve presumir que todos os valores de 2017–2025 tenham a mesma origem ou condição de observação.
 
 ### Insights visuais:
 
