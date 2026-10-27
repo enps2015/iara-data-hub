@@ -4,6 +4,8 @@
 
 ![IARA Data Hub Cover](img/iara_cover.png)
 
+**Demonstração online:** [Abrir o IARA Data Hub ↗](https://enps2015.github.io/iara-data-hub/)
+
 ![Status](https://img.shields.io/badge/Status-Ativo-brightgreen)
 ![Dados](https://img.shields.io/badge/Dados-2017--2025-blue)
 ![Licença](https://img.shields.io/badge/Licença-CC_BY_4.0-orange)
@@ -214,7 +216,7 @@ Depois de alterar os dados, execute `node --test tests/dataUtils.test.cjs` e con
 3. Em "Source", selecione **Deploy from a branch**
 4. Escolha a branch `main` e pasta `/ (root)`
 5. Clique em **Save**
-6. O site estará disponível em: `https://seu-usuario.github.io/iara-data-hub/`
+6. O site estará disponível em: `https://enps2015.github.io/iara-data-hub/`
 
 ---
 
