@@ -66,10 +66,20 @@ function renderDataQualityNotice(report, loadError) {
     if (loadError || !report) {
         notice.style.borderColor = 'rgba(248, 113, 113, 0.65)';
         notice.textContent = `Não foi possível carregar os dados do observatório. ${loadError || 'Verifique o CSV e tente novamente.'}`;
-    } else if (report.invalidCells > 0) {
-        notice.innerHTML = `<strong style="color:#fbbf24">Qualidade dos dados:</strong> ${report.rowCount} registros carregados. ${report.missingCells} células vazias e ${report.invalidCells} valores inválidos estão preservados como <code>N/D</code>, sem serem convertidos em zero.`;
-    } else if (report.missingCells > 0) {
-        notice.innerHTML = `<strong style="color:#67e8f9">Transparência dos dados:</strong> ${report.rowCount} registros carregados. ${report.missingCells} células sem informação são exibidas como <code>N/D</code>; valores ausentes não são tratados como zero.`;
+    } else if (report.invalidCells > 0 || report.missingCells > 0) {
+        const year2023 = globalData.filter(record => record.ano === 2023);
+        const completeComparisons2023 = year2023.filter(record =>
+            DataUtils.isAvailableNumber(record.coleta_esgoto) &&
+            DataUtils.isAvailableNumber(record.taxa_internacoes_hidricas_10k)
+        ).length;
+        const comparisonNote = year2023.length > 0
+            ? ` <strong>${completeComparisons2023} de ${year2023.length}</strong> registros de 2023 têm coleta de esgoto e taxa de internações simultaneamente disponíveis; o gráfico de dispersão usa apenas essas observações.`
+            : '';
+        if (report.invalidCells > 0) {
+            notice.innerHTML = `<strong style="color:#fbbf24">Qualidade dos dados:</strong> ${report.rowCount} registros carregados. ${report.missingCells} células vazias e ${report.invalidCells} valores inválidos estão preservados como <code>N/D</code>, sem serem convertidos em zero.${comparisonNote}`;
+        } else {
+            notice.innerHTML = `<strong style="color:#67e8f9">Transparência dos dados:</strong> ${report.rowCount} registros carregados. ${report.missingCells} células sem informação são exibidas como <code>N/D</code>; valores ausentes não são tratados como zero.${comparisonNote}`;
+        }
     }
 
     if (!loadError && report && report.missingCells === 0 && report.invalidCells === 0) return;
