@@ -3,10 +3,6 @@ import numpy as np
 import glob
 import os
 import unicodedata
-import warnings
-
-# Suppress warnings for cleaner output
-warnings.filterwarnings('ignore')
 
 # -------------------------------------------------------------------------
 # CONSTANTS & CONFIG
@@ -389,16 +385,35 @@ def select_sih_admissions(frame, source_name, seen_aihs=None):
         )
     if not np.equal(residence, np.floor(residence)).all():
         raise ValueError(f"{source_name}: MUNIC_RES contém código não inteiro.")
+    residence_codes = residence.astype(int).astype(str)
+    if not residence_codes.str.fullmatch(r'[0-9]{6}').all():
+        raise ValueError(f"{source_name}: MUNIC_RES deve usar código municipal DATASUS de 6 dígitos.")
     selected['MUNIC_RES'] = residence.astype(int)
 
     date_text = selected['DT_INTER'].astype(str).str.strip()
-    valid_dates = date_text.str.fullmatch(r'(?:[0-9]{6}|[0-9]{8})')
-    if not valid_dates.all():
+    valid_formats = date_text.str.fullmatch(r'(?:[0-9]{6}|[0-9]{8})')
+    if not valid_formats.all():
         raise ValueError(
-            f"{source_name}: {int((~valid_dates).sum())} internações A00–A09 "
+            f"{source_name}: {int((~valid_formats).sum())} internações A00–A09 "
             "têm DT_INTER fora do formato YYYYMM ou YYYYMMDD."
         )
-    years = date_text.str[:4].astype(int)
+
+    # Validate the calendar date/month as well as the string format.
+    parsed_dates = pd.Series(pd.NaT, index=date_text.index, dtype='datetime64[ns]')
+    day_precision = date_text.str.len() == 8
+    parsed_dates.loc[day_precision] = pd.to_datetime(
+        date_text.loc[day_precision], format='%Y%m%d', errors='coerce'
+    )
+    month_precision = ~day_precision
+    parsed_dates.loc[month_precision] = pd.to_datetime(
+        date_text.loc[month_precision], format='%Y%m', errors='coerce'
+    )
+    if parsed_dates.isna().any():
+        raise ValueError(
+            f"{source_name}: {int(parsed_dates.isna().sum())} internações A00–A09 "
+            "têm data de atendimento inválida."
+        )
+    years = parsed_dates.dt.year
     if not years.between(1990, 2100).all():
         raise ValueError(f"{source_name}: ano inválido derivado de DT_INTER.")
     selected['ano'] = years
@@ -541,10 +556,10 @@ def load_inmet():
         
     df_climate = pd.DataFrame(stats)
     
-    # Calculate Simplified Risk Index
-    # Normalize Precip (inverted? No, irregular precip is bad, but let's assume High Precip + High Temp = Risk for water diseases like Dengue/Lepto)
-    # Actually, for water-borne (A00-A09), flooding is a major risk. So High Precip is risk.
-    # High Temp also promotes bacterial growth.
+    # Exploratory descriptive index only: min–max normalized precipitation and
+    # temperature are combined across available station-years. This is not a
+    # validated epidemiological model, and it does not establish a causal link
+    # with CID-10 A00–A09 or measure municipality-specific exposure.
     
     # Simple Min-Max Normalization
     if not df_climate.empty:
