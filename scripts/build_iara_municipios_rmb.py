@@ -462,6 +462,12 @@ def load_sih():
                 sep=None,
                 engine='python',
                 encoding='iso-8859-1',
+                dtype={
+                    'MUNIC_RES': 'string',
+                    'DT_INTER': 'string',
+                    'DIAG_PRINC': 'string',
+                    'N_AIH': 'string',
+                },
                 on_bad_lines='error'
             )
             source_rows = len(df)
