@@ -4,16 +4,34 @@ const Storytelling = {
     },
 
     renderRealityCheck(data) {
-        // Calculate Total Hospitalizations (All Years)
-        const totalHosp = data.reduce((sum, d) => sum + (d.internacoes_hidricas_total || 0), 0);
-        
-        // Calculate Average Sewage Treatment (2023 only for "current state")
-        const data2023 = data.filter(d => d.ano === 2023);
-        const avgSewage = data2023.reduce((sum, d) => sum + (d.tratamento_esgoto || 0), 0) / data2023.length;
+        // Do not present a partial total as a complete total when counts are missing.
+        const admissionsComplete = data.length > 0
+            && data.every(d => DataUtils.isAvailableNumber(d.internacoes_hidricas_total));
+        const totalHosp = admissionsComplete
+            ? data.reduce((sum, d) => sum + d.internacoes_hidricas_total, 0)
+            : null;
 
-        // Animate Numbers
-        this.animateValue("stat-hospitalizations", 0, totalHosp, 2000);
-        this.animateValue("stat-sewage", 0, avgSewage, 2000, 1);
+        // Only show a 2023 mean when every municipality has a numeric value.
+        const data2023 = data.filter(d => d.ano === 2023);
+        const treatmentValues = data2023.filter(d => DataUtils.isAvailableNumber(d.tratamento_esgoto));
+        const treatmentComplete = data2023.length > 0 && treatmentValues.length === data2023.length;
+        const avgSewage = treatmentComplete
+            ? treatmentValues.reduce((sum, d) => sum + d.tratamento_esgoto, 0) / treatmentValues.length
+            : null;
+
+        if (DataUtils.isAvailableNumber(totalHosp)) {
+            this.animateValue("stat-hospitalizations", 0, totalHosp, 2000);
+        } else {
+            const admissionsElement = document.getElementById("stat-hospitalizations");
+            if (admissionsElement) admissionsElement.textContent = "N/D";
+        }
+
+        if (DataUtils.isAvailableNumber(avgSewage)) {
+            this.animateValue("stat-sewage", 0, avgSewage, 2000, 1);
+        } else {
+            const treatmentElement = document.getElementById("stat-sewage");
+            if (treatmentElement) treatmentElement.textContent = "N/D";
+        }
     },
 
     renderMunicipalityCards(data) {
@@ -53,12 +71,12 @@ const Storytelling = {
                     <div class="p-6">
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div>
-                                <p class="text-xs text-slate-400 uppercase font-bold">Internações (2023)</p>
-                                <p class="text-xl font-bold text-rose-500">${lastRecord.internacoes_hidricas_total || 0}</p>
+                                <p class="text-xs text-slate-400 uppercase font-bold">Internações CID A00–A09 (2023)</p>
+                                <p class="text-xl font-bold text-rose-500">${DataUtils.isAvailableNumber(lastRecord?.internacoes_hidricas_total) ? DataUtils.formatNumber(lastRecord.internacoes_hidricas_total, 0) : 'N/D'}</p>
                             </div>
                             <div>
-                                <p class="text-xs text-slate-400 uppercase font-bold">Esgoto (2023)</p>
-                                <p class="text-xl font-bold text-teal-500">${(lastRecord.coleta_esgoto || 0).toFixed(1)}%</p>
+                                <p class="text-xs text-slate-400 uppercase font-bold">Coleta de esgoto (2023)</p>
+                                <p class="text-xl font-bold text-teal-500">${DataUtils.isAvailableNumber(lastRecord?.coleta_esgoto) ? DataUtils.formatNumber(lastRecord.coleta_esgoto, 1, '%') : 'N/D'}</p>
                             </div>
                         </div>
                         <div class="border-t border-white/5 pt-4 mt-2">
