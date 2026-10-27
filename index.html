@@ -171,7 +171,7 @@
                     </p>
                     <p style="color: var(--text-dark-muted)">
                         Quanto desse dinheiro chega para resolver água e esgoto na RMB? 
-                        Quanto efetivamente reduz as internações por diarreia?
+                        Que evidências permitiriam avaliar se investimentos em saneamento estão associados a mudanças nas internações?
                     </p>
                     <div class="context-question">
                         <i class="fas fa-question-circle mr-2"></i>
@@ -467,7 +467,7 @@
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-value" style="color: var(--accent-orange)" id="kpi-disease">--</div>
-                        <div class="kpi-label">Internações/10k hab</div>
+                        <div class="kpi-label">CID A00–A09 / 10 mil hab.</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-value" style="color: var(--accent-gold)" id="kpi-risk">--</div>
@@ -586,7 +586,7 @@
                 <div class="chart-legend">
                     <div class="legend-item">
                         <div class="legend-dot" style="background: var(--accent-magenta)"></div>
-                        <span>Internações por 10k hab</span>
+                        <span>Internações CID-10 A00–A09 por 10 mil hab.</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-dot" style="background: var(--accent-cyan)"></div>
@@ -603,7 +603,7 @@
                 <div class="panel p-6">
                     <h4 class="font-bold mb-2">📊 Leitura do gráfico</h4>
                     <p class="text-sm" style="color: var(--text-dark-muted)">
-                        A faixa sombreada (2019–2023) representa a janela de dados robustos e aceleração de obras.
+                        A faixa sombreada (2019–2023) destaca um período de comparação; a cobertura e a qualidade das séries precisam ser consideradas.
                         A linha dourada em 2025 marca a COP30. 
                         <strong>Observe:</strong> a curva de internações (magenta) acompanha — ou não — os investimentos em esgoto (ciano).
                     </p>
@@ -611,9 +611,8 @@
                 <div class="panel p-6" style="border-left: 3px solid var(--accent-magenta)">
                     <h4 class="font-bold mb-2" style="color: var(--accent-magenta)">⚠️ O que isso significa</h4>
                     <p class="text-sm" style="color: var(--text-dark-muted)">
-                        <strong>Se a curva de obras sobe mas a curva de internações não cai na mesma proporção, 
-                        existe descompasso entre infraestrutura entregue e efeito em saúde pública.</strong>
-                        O legado real se mede em vidas, não em quilômetros de tubos.
+                        Mudanças simultâneas nas séries podem sugerir perguntas para investigação, mas não demonstram que obras causaram aumento ou redução das internações.
+                        Uma avaliação de impacto exige dados comparáveis, controle de outros fatores e desenho analítico adequado.
                     </p>
                 </div>
             </div>
@@ -812,15 +811,14 @@
                     <ul class="space-y-2 mb-6" style="color: var(--text-dark-muted)">
                         <li>• <strong>Proxy epidemiológico exploratório:</strong> CID-10 A00–A09 (doenças intestinais infecciosas); não implica transmissão hídrica em todos os casos</li>
                         <li>• <strong>Taxa padronizada:</strong> Internações por 10 mil habitantes</li>
-                        <li>• <strong>Janela temporal:</strong> 2017–2025 (projeções para 2024-25)</li>
+                        <li>• <strong>Janela temporal:</strong> 2017–2025; indicadores de saneamento ausentes no CSV em 2017, 2018, 2024 e 2025</li>
                         <li>• <strong>Escopo:</strong> 7 municípios da Região Metropolitana de Belém</li>
                     </ul>
                     
                     <div class="alert-box alert-info">
                         <p class="text-sm">
                             <i class="fas fa-shield-alt mr-2" style="color: var(--accent-cyan)"></i>
-                            <strong>Compromisso:</strong> Nenhum dado de saneamento ou saúde foi inventado ou completado por IA. 
-                            Lacunas foram mantidas como null para preservar a integridade da análise.
+                            <strong>Nota de qualidade:</strong> lacunas de saneamento permanecem como ausentes. Os totais SIH estão em auditoria: a rotina anterior podia converter ausência de correspondência em zero. Consulte a proveniência antes de interpretar taxas ou comparações.
                         </p>
                     </div>
                 </div>
