@@ -117,31 +117,47 @@ test('JSON publicado permanece sincronizado com o CSV consolidado', () => {
     assert.deepEqual(jsonRecords, csvRecords);
 });
 
-test('população de 2017–2021 corresponde à tabela FAPESPA/IBGE e taxa é derivada da população anual', () => {
+
+test('população e taxas de 2022–2025 correspondem às fontes documentadas', () => {
     const csvPath = path.join(__dirname, '..', 'data', 'iara', 'iara_municipios_rmb.csv');
     const records = DataUtils.parseCSV(fs.readFileSync(csvPath, 'utf8'));
     const expected = {
-        'Ananindeua (PA)': [516057, 525566, 530598, 535547, 540410],
-        'Belém (PA)': [1452275, 1485732, 1492745, 1499641, 1506420],
-        'Benevides (PA)': [60990, 61689, 62737, 63768, 64780],
-        'Castanhal (PA)': [195253, 198294, 200793, 203251, 205667],
-        'Marituba (PA)': [127858, 129321, 131521, 133685, 135812],
-        'Santa Bárbara do Pará (PA)': [20492, 20704, 21079, 21449, 21811],
-        'Santa Izabel do Pará (PA)': [68836, 69746, 70801, 71837, 72856]
+        'Ananindeua (PA)': { 2022: 478778, 2023: 478778, 2024: 507838, 2025: 509227 },
+        'Belém (PA)': { 2022: 1303403, 2023: 1303403, 2024: 1398531, 2025: 1397315 },
+        'Benevides (PA)': { 2022: 63567, 2023: 63567, 2024: 68191, 2025: 68962 },
+        'Castanhal (PA)': { 2022: 192256, 2023: 192256, 2024: 207603, 2025: 209126 },
+        'Marituba (PA)': { 2022: 111785, 2023: 111785, 2024: 118998, 2025: 119437 },
+        'Santa Bárbara do Pará (PA)': { 2022: 21087, 2023: 21087, 2024: 22288, 2025: 22530 },
+        'Santa Izabel do Pará (PA)': { 2022: 73019, 2023: 73019, 2024: 78317, 2025: 79195 }
     };
 
-    for (const [municipality, populations] of Object.entries(expected)) {
-        for (let index = 0; index < populations.length; index += 1) {
-            const year = 2017 + index;
+    for (const [municipality, yearValues] of Object.entries(expected)) {
+        for (const [yearText, population] of Object.entries(yearValues)) {
+            const year = Number(yearText);
             const record = records.find(row => row.municipio === municipality && row.ano === year);
-            assert.ok(record, `registro ausente para ${municipality}/${year}`);
-            assert.equal(record.populacao, populations[index]);
+            assert.ok(record, 'registro ausente para ' + municipality + '/' + year);
+            assert.equal(record.populacao, population);
             assert.ok(record.populacao > 0);
-            const expectedRate = (record.internacoes_hidricas_total / record.populacao) * 10000;
+            const expectedRate = (record.internacoes_hidricas_total / population) * 10000;
             assert.ok(
                 Math.abs(record.taxa_internacoes_hidricas_10k - expectedRate) < 1e-12,
-                `taxa incoerente para ${municipality}/${year}`
+                'taxa incoerente para ' + municipality + '/' + year
             );
         }
+    }
+});
+
+test('população de 2023 usa explicitamente o valor de referência do Censo 2022', () => {
+    const csvPath = path.join(__dirname, '..', 'data', 'iara', 'iara_municipios_rmb.csv');
+    const records = DataUtils.parseCSV(fs.readFileSync(csvPath, 'utf8'));
+    const rows2022 = records.filter(row => row.ano === 2022);
+    const rows2023 = records.filter(row => row.ano === 2023);
+
+    assert.equal(rows2022.length, 7);
+    assert.equal(rows2023.length, 7);
+    for (const row2022 of rows2022) {
+        const row2023 = rows2023.find(row => row.cod_ibge === row2022.cod_ibge);
+        assert.ok(row2023, 'registro de 2023 ausente para código ' + row2022.cod_ibge);
+        assert.equal(row2023.populacao, row2022.populacao);
     }
 });
