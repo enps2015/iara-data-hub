@@ -30,11 +30,20 @@ class SelectSihAdmissionsTests(unittest.TestCase):
     def test_fails_when_a_target_admission_has_invalid_date(self):
         frame = pd.DataFrame({
             "MUNIC_RES": [150080],
-            "DT_INTER": ["2023-01-05"],
+            "DT_INTER": ["20239999"],
             "DIAG_PRINC": ["A00"],
         })
         with self.assertRaisesRegex(ValueError, "DT_INTER"):
             select_sih_admissions(frame, "invalid-date.csv")
+
+    def test_fails_when_residence_code_is_not_six_digits(self):
+        frame = pd.DataFrame({
+            "MUNIC_RES": ["1500800"],
+            "DT_INTER": ["20230105"],
+            "DIAG_PRINC": ["A00"],
+        })
+        with self.assertRaisesRegex(ValueError, "6 dígitos"):
+            select_sih_admissions(frame, "seven-digit-residence.csv")
 
     def test_fails_when_a_target_admission_has_invalid_residence_code(self):
         frame = pd.DataFrame({
