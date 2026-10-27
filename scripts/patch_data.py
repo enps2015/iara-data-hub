@@ -85,7 +85,7 @@ def main() -> None:
 
     # Years outside the cited source window are not touched by this script.
     with CSV_PATH.open("w", encoding="utf-8", newline="") as destination:
-        writer = csv.DictWriter(destination, fieldnames=fieldnames, lineterminator="\\n")
+        writer = csv.DictWriter(destination, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -96,3 +96,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
