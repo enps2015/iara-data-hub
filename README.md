@@ -41,12 +41,12 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 ### Correlações importantes:
 
 - **Saneamento × Saúde**: Municípios com menor cobertura de esgoto apresentam maiores taxas de internações por doenças hídricas
-- **Apagão de Dados**: Apenas 2023 tem cobertura completa na RMB; anos anteriores têm lacunas significativas que dificultam políticas públicas
+- **Apagão de Dados**: A série de 2017–2025 contém lacunas importantes. Em 2023, três dos sete municípios não têm coleta de esgoto informada; gráficos que relacionam saneamento e internações usam somente registros com ambos os indicadores disponíveis.
 - **Desigualdade Metropolitana**: Enquanto alguns municípios avançam, outros permanecem na "zona crítica" do mapa da injustiça hídrica
 
 ### Insights visuais:
 
-- O **Mapa da Injustiça Hídrica** mostra que nenhum município da RMB está na zona ideal (alta coleta + baixa doença)
+- O **Mapa da Injustiça Hídrica** compara coleta de esgoto e internações usando medianas dos registros completos. O quadrante mais favorável é relativo aos municípios observados e não significa, por si só, que a situação sanitária seja ideal em termos absolutos.
 - A **Linha do Tempo** revela se a aceleração de obras (2019-2023) impactou a curva de internações
 - A **Matriz de Dados** expõe quanto da gestão pública é feita "no escuro", sem informações básicas
 
