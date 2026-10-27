@@ -3,10 +3,6 @@ import numpy as np
 import glob
 import os
 import unicodedata
-import warnings
-
-# Suppress warnings for cleaner output
-warnings.filterwarnings('ignore')
 
 # -------------------------------------------------------------------------
 # CONSTANTS & CONFIG
@@ -25,7 +21,7 @@ RMB_CITIES = [
 ]
 
 # Path Config
-BASE_DIR = '/home/anunnaki/Documentos/I2A2/tarefas/IARA Data Hub – Água, Saneamento & Saúde na Amazônia'
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 BRONZE_DIR = os.path.join(DATA_DIR, 'bronze')
 OUTPUT_DIR = os.path.join(DATA_DIR, 'iara')
@@ -344,12 +340,9 @@ def load_ibge():
     
     # We might need to filter by RMB here too, but we can do it at merge time via cod_ibge
     # But let's filter by name to be safe if cod_ibge is missing
-    # Sort by municipality and year to ensure correct forward fill
+    # Keep missing populations as missing. A previous version forward-filled
+    # values across years without recording the source/reference year.
     full_df = full_df.sort_values(['cod_ibge', 'ano'])
-    
-    # Forward fill population for missing years (e.g. 2022, 2023 if empty)
-    # We group by cod_ibge and apply ffill
-    full_df['populacao'] = full_df.groupby('cod_ibge')['populacao'].ffill()
     
     if 'municipio_raw' in full_df.columns:
         # Handle "Belém (PA)" -> "BELEM"
@@ -359,80 +352,161 @@ def load_ibge():
         
     return full_df[['cod_ibge', 'municipio_raw', 'populacao', 'ano']]
 
+def select_sih_admissions(frame, source_name, seen_aihs=None):
+    """Return validated admissions with principal ICD-10 diagnosis A00–A09.
+
+    A00–A09 means intestinal infectious diseases; this range is not proof that
+    each admission was transmitted through water. Invalid target rows fail
+    visibly instead of being silently dropped.
+    """
+    if seen_aihs is None:
+        seen_aihs = set()
+
+    data = frame.copy()
+    data.columns = [str(column).strip().upper() for column in data.columns]
+    required = {'MUNIC_RES', 'DT_INTER', 'DIAG_PRINC'}
+    missing = sorted(required - set(data.columns))
+    if missing:
+        raise ValueError(
+            f"{source_name}: colunas obrigatórias ausentes: {', '.join(missing)}"
+        )
+
+    diagnosis = data['DIAG_PRINC'].astype(str).str.strip().str.upper()
+    selected = data.loc[diagnosis.str.match(r'^A0[0-9]')].copy()
+    if selected.empty:
+        return selected
+
+    residence = pd.to_numeric(selected['MUNIC_RES'], errors='coerce')
+    invalid_residence = residence.isna() | ~np.isfinite(residence)
+    if invalid_residence.any():
+        raise ValueError(
+            f"{source_name}: {int(invalid_residence.sum())} internações A00–A09 "
+            "têm MUNIC_RES ausente ou inválido."
+        )
+    if not np.equal(residence, np.floor(residence)).all():
+        raise ValueError(f"{source_name}: MUNIC_RES contém código não inteiro.")
+    residence_codes = residence.astype(int).astype(str)
+    if not residence_codes.str.fullmatch(r'[0-9]{6}').all():
+        raise ValueError(f"{source_name}: MUNIC_RES deve usar código municipal DATASUS de 6 dígitos.")
+    selected['MUNIC_RES'] = residence.astype(int)
+
+    date_text = selected['DT_INTER'].astype(str).str.strip()
+    valid_formats = date_text.str.fullmatch(r'(?:[0-9]{6}|[0-9]{8})')
+    if not valid_formats.all():
+        raise ValueError(
+            f"{source_name}: {int((~valid_formats).sum())} internações A00–A09 "
+            "têm DT_INTER fora do formato YYYYMM ou YYYYMMDD."
+        )
+
+    # Validate the calendar date/month as well as the string format.
+    parsed_dates = pd.Series(pd.NaT, index=date_text.index, dtype='datetime64[ns]')
+    day_precision = date_text.str.len() == 8
+    parsed_dates.loc[day_precision] = pd.to_datetime(
+        date_text.loc[day_precision], format='%Y%m%d', errors='coerce'
+    )
+    month_precision = ~day_precision
+    parsed_dates.loc[month_precision] = pd.to_datetime(
+        date_text.loc[month_precision], format='%Y%m', errors='coerce'
+    )
+    if parsed_dates.isna().any():
+        raise ValueError(
+            f"{source_name}: {int(parsed_dates.isna().sum())} internações A00–A09 "
+            "têm DT_INTER inválida (data de atendimento)."
+        )
+    years = parsed_dates.dt.year
+    if not years.between(1990, 2100).all():
+        raise ValueError(f"{source_name}: ano inválido derivado de DT_INTER.")
+    selected['ano'] = years
+
+    # N_AIH is commonly present in reduced SIH files. If available, use it to
+    # detect duplicate target admissions across overlapping source files.
+    if 'N_AIH' in selected.columns:
+        ids = selected['N_AIH'].astype(str).str.strip()
+        missing_ids = ids.str.lower().isin(['', 'nan', 'none', 'na', '<na>'])
+        usable_ids = ids.loc[~missing_ids]
+        duplicate_ids = usable_ids[usable_ids.duplicated() | usable_ids.isin(seen_aihs)]
+        if not duplicate_ids.empty:
+            sample = ', '.join(duplicate_ids.drop_duplicates().head(5).tolist())
+            raise ValueError(
+                f"{source_name}: possíveis AIHs duplicadas entre arquivos "
+                f"de origem (exemplos: {sample}). Verifique sobreposição."
+            )
+        seen_aihs.update(usable_ids.tolist())
+
+    return selected
+
+
 def load_sih():
     """
-    Loads SIH (Hospital Admissions) data.
-    Filters for Water-borne diseases (CID A00-A09).
+    Loads SIH/SUS hospitalization records and aggregates principal diagnoses
+    ICD-10 A00–A09 (intestinal infectious diseases) by residence and year.
+
+    An absent match is kept as missing, not converted to zero. The raw files
+    are required to validate time coverage before a zero can be inferred.
     """
-    print("--- Loading SIH Data ---")
-    # Pattern: .../sih/csv/RDPA*.csv
-    sih_files = glob.glob(os.path.join(BRONZE_DIR, 'sih', 'csv', 'RDPA*.csv'))
-    
+    print("--- Loading SIH/SUS Data (CID-10 A00–A09) ---")
+    sih_files = sorted(glob.glob(os.path.join(BRONZE_DIR, 'sih', 'csv', 'RDPA*.csv')))
+    empty_result = pd.DataFrame(columns=['cod_ibge', 'ano', 'internacoes_hidricas_total'])
+
+    if not sih_files:
+        print("WARNING: No SIH RDPA*.csv files found; admission counts will remain missing, not zero.")
+        return empty_result
+
     dfs = []
-    
-    # CID-10 Codes for Water-borne diseases: A00 to A09
-    # We will filter DIAG_PRINC starts with 'A0'
-    
-    for f in sih_files:
-        # print(f"Processing {f}...")
+    seen_aihs = set()
+
+    for source_file in sih_files:
         try:
-            # Read CSV with robust settings
-            df = pd.read_csv(f, sep=None, engine='python', encoding='iso-8859-1', on_bad_lines='skip')
-            
-            # Normalize columns
-            df.columns = [c.upper() for c in df.columns]
-            
-            # Filter columns
-            cols_needed = ['MUNIC_RES', 'DT_INTER', 'DIAG_PRINC']
-            if not all(c in df.columns for c in cols_needed):
-                print(f"Skipping {f}: Missing columns. Found: {list(df.columns)}")
+            df = pd.read_csv(
+                source_file,
+                sep=None,
+                engine='python',
+                encoding='iso-8859-1',
+                dtype={
+                    'MUNIC_RES': 'string',
+                    'DT_INTER': 'string',
+                    'DIAG_PRINC': 'string',
+                    'N_AIH': 'string',
+                },
+                on_bad_lines='error'
+            )
+            source_rows = len(df)
+            selected = select_sih_admissions(df, source_file, seen_aihs)
+            print(
+                f"SIH source {os.path.basename(source_file)}: "
+                f"{source_rows} input rows; {len(selected)} records with primary CID A00–A09."
+            )
+
+            if selected.empty:
                 continue
-            
-            # Ensure MUNIC_RES is numeric
-            df['MUNIC_RES'] = pd.to_numeric(df['MUNIC_RES'], errors='coerce')
-            df = df.dropna(subset=['MUNIC_RES'])
-            df['MUNIC_RES'] = df['MUNIC_RES'].astype(int)
-            
-            rows_before = len(df)
-            
-            # Filter Disease
-            df = df[df['DIAG_PRINC'].astype(str).str.strip().str.startswith('A0')]
-            
-            rows_after = len(df)
-            if rows_after > 0:
-                print(f"DEBUG {os.path.basename(f)}: Found {rows_after} water-borne records (from {rows_before})")
-            
-            if df.empty:
-                continue
-                
-            # Extract Year from DT_INTER (Format YYYYMM or YYYYMMDD)
-            # Usually in RD files it's YYYYMMDD
-            df['DT_INTER'] = df['DT_INTER'].astype(str)
-            df['ano'] = df['DT_INTER'].str[:4].astype(int)
-            
-            # Group by Municipality and Year
-            grouped = df.groupby(['MUNIC_RES', 'ano']).size().reset_index(name='internacoes_hidricas_total')
-            
+
+            grouped = (
+                selected.groupby(['MUNIC_RES', 'ano'])
+                .size()
+                .reset_index(name='internacoes_hidricas_total')
+            )
             dfs.append(grouped)
-            
-        except Exception as e:
-            print(f"Error reading {f}: {e}")
-            pass
-            
+        except Exception as error:
+            raise RuntimeError(
+                f"Failed to validate SIH source file {source_file}; "
+                f"the file was not silently skipped: {error}"
+            ) from error
+
     if not dfs:
-        print("DEBUG: SIH - No data found in files.")
-        return pd.DataFrame()
-        
+        print("WARNING: No validated A00–A09 admissions were found; counts will remain missing, not zero.")
+        return empty_result
+
     full_df = pd.concat(dfs, ignore_index=True)
-    
-    # Aggregate again in case multiple files cover same year/municipality
-    final_df = full_df.groupby(['MUNIC_RES', 'ano'])['internacoes_hidricas_total'].sum().reset_index()
-    final_df = final_df.rename(columns={'MUNIC_RES': 'cod_ibge'})
-    
-    print(f"DEBUG: SIH Data Loaded. {len(final_df)} rows.")
-    print(f"DEBUG: SIH Sample: {final_df.head(2).to_dict()}")
-    
+    final_df = (
+        full_df.groupby(['MUNIC_RES', 'ano'])['internacoes_hidricas_total']
+        .sum()
+        .reset_index()
+        .rename(columns={'MUNIC_RES': 'cod_ibge'})
+    )
+
+    print(f"SIH aggregation produced {len(final_df)} municipality/year groups.")
     return final_df
+
 
 def load_inmet():
     """
@@ -488,10 +562,10 @@ def load_inmet():
         
     df_climate = pd.DataFrame(stats)
     
-    # Calculate Simplified Risk Index
-    # Normalize Precip (inverted? No, irregular precip is bad, but let's assume High Precip + High Temp = Risk for water diseases like Dengue/Lepto)
-    # Actually, for water-borne (A00-A09), flooding is a major risk. So High Precip is risk.
-    # High Temp also promotes bacterial growth.
+    # Exploratory descriptive index only: min–max normalized precipitation and
+    # temperature are combined across available station-years. This is not a
+    # validated epidemiological model, and it does not establish a causal link
+    # with CID-10 A00–A09 or measure municipality-specific exposure.
     
     # Simple Min-Max Normalization
     if not df_climate.empty:
@@ -595,15 +669,13 @@ def main():
             for _, row in municipalities.iterrows():
                 new_row = row.to_dict()
                 new_row['ano'] = year
-                new_row['populacao'] = 0 # Or NaN, but int col requires value. 0 indicates missing.
+                new_row['populacao'] = np.nan  # Missing population is not a real zero.
                 new_rows.append(new_row)
                 
         if new_rows:
             df_ibge = pd.concat([df_ibge, pd.DataFrame(new_rows)], ignore_index=True)
 
     final_df = df_ibge.copy()
-    df_sih = load_sih()
-    df_inmet = load_inmet()
     
     if df_ibge.empty:
         print("CRITICAL: No IBGE data found. Cannot build base dataset.")
@@ -656,7 +728,8 @@ def main():
         print(f"DEBUG: After SIH Merge. Non-null internacoes: {final_df['internacoes_hidricas_total'].count()}")
         print(f"DEBUG: Sample with internacoes:\n{final_df[final_df['internacoes_hidricas_total'].notnull()].head(2)}")
     else:
-        final_df['internacoes_hidricas_total'] = 0
+        # No source rows is not evidence of zero admissions.
+        final_df['internacoes_hidricas_total'] = np.nan
 
     # 5. Merge Climate (Broadcast by Year)
     if not df_inmet.empty:
@@ -665,9 +738,19 @@ def main():
         final_df['risco_climatico'] = np.nan
     
     # 6. Calculations
-    # Hospitalization Rate per 10k
-    final_df['internacoes_hidricas_total'] = final_df['internacoes_hidricas_total'].fillna(0)
-    final_df['taxa_internacoes_hidricas_10k'] = (final_df['internacoes_hidricas_total'] / final_df['populacao']) * 10000
+    # Admission rate per 10,000 is derived only when both the count and a
+    # positive population denominator are available.
+    final_df['taxa_internacoes_hidricas_10k'] = np.nan
+    valid_rate = (
+        final_df['internacoes_hidricas_total'].notna()
+        & final_df['populacao'].notna()
+        & (final_df['populacao'] > 0)
+    )
+    final_df.loc[valid_rate, 'taxa_internacoes_hidricas_10k'] = (
+        final_df.loc[valid_rate, 'internacoes_hidricas_total']
+        / final_df.loc[valid_rate, 'populacao']
+        * 10000
+    )
     
     # 7. Final Cleanup
     cols_order = [

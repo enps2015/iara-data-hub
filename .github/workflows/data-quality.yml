@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - "assets/js/**"
+      - "index.html"
+      - "README.md"
+      - "docs/data-provenance.md"
+      - "scripts/**"
       - "data/iara/iara_municipios_rmb.csv"
       - "data/iara/iara_municipios_rmb.json"
       - "tests/**"
@@ -12,7 +16,12 @@ on:
   pull_request:
     paths:
       - "assets/js/**"
+      - "index.html"
+      - "README.md"
+      - "docs/data-provenance.md"
+      - "scripts/**"
       - "data/iara/iara_municipios_rmb.csv"
+      - "data/iara/iara_municipios_rmb.json"
       - "tests/**"
       - ".github/workflows/data-quality.yml"
   workflow_dispatch:
@@ -38,6 +47,21 @@ jobs:
           node --check assets/js/dataUtils.js
           node --check assets/js/charts.js
           node --check assets/js/main.js
+          node --check assets/js/storytelling.js
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências do pipeline de dados
+        run: python -m pip install --disable-pip-version-check pandas numpy
+
+      - name: Verificar sintaxe do pipeline Python
+        run: python -m py_compile scripts/build_iara_municipios_rmb.py scripts/patch_data.py
+
+      - name: Testar validação de registros SIH
+        run: python -m unittest discover -s tests -p 'test_sih_etl.py' -v
 
       - name: Executar testes do parser e da qualidade de dados
         run: node --test tests/dataUtils.test.cjs

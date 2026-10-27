@@ -80,7 +80,7 @@ const Charts = {
                                 return [
                                     `${p.municipio}`,
                                     `Esgoto: ${p.x.toFixed(1)}%`,
-                                    `Internações: ${p.y.toFixed(1)}/10k`,
+                                    `CID A00–A09: ${p.y.toFixed(1)}/10k`,
                                     `População: ${DataUtils.isAvailableNumber(p.populacao) ? (p.populacao / 1000).toFixed(0) + 'k' : 'N/D'}`
                                 ];
                             }
@@ -115,7 +115,7 @@ const Charts = {
                                 borderDash: [6, 4],
                                 label: {
                                     display: true,
-                                    content: 'Mediana Internações',
+                                    content: 'Mediana taxa CID A00–A09',
                                     position: 'end',
                                     backgroundColor: 'rgba(15, 23, 42, 0.8)',
                                     color: '#94a3b8',
@@ -137,7 +137,7 @@ const Charts = {
                                 type: 'label',
                                 xValue: 5,
                                 yValue: 12,
-                                content: ['⚠️ ALERTA RELATIVO', 'Coleta abaixo da mediana', 'Internações acima da mediana'],
+                                content: ['⚠️ ALERTA RELATIVO', 'Coleta abaixo da mediana', 'Taxa CID A00–A09 acima da mediana'],
                                 backgroundColor: 'rgba(236, 72, 153, 0.2)',
                                 color: '#ec4899',
                                 font: { size: 10, weight: 'bold' },
@@ -148,7 +148,7 @@ const Charts = {
                                 type: 'label',
                                 xValue: 40,
                                 yValue: 2,
-                                content: ['✓ QUADRANTE FAVORÁVEL', 'Coleta acima da mediana', 'Internações abaixo da mediana'],
+                                content: ['✓ QUADRANTE FAVORÁVEL', 'Coleta acima da mediana', 'Taxa CID A00–A09 abaixo da mediana'],
                                 backgroundColor: 'rgba(34, 211, 238, 0.2)',
                                 color: '#22d3ee',
                                 font: { size: 10, weight: 'bold' },
@@ -174,7 +174,7 @@ const Charts = {
                     y: {
                         title: { 
                             display: true, 
-                            text: 'Internações (por 10k hab)', 
+                            text: 'Taxa CID A00–A09 (por 10 mil hab)', 
                             color: '#94a3b8',
                             font: { size: 13, weight: 'bold' }
                         },
@@ -207,7 +207,8 @@ const Charts = {
             );
             const totalPop = healthData.reduce((sum, d) => sum + d.populacao, 0);
             const totalCases = healthData.reduce((sum, d) => sum + d.internacoes_hidricas_total, 0);
-            return healthData.length > 0 && totalPop > 0 ? (totalCases / totalPop) * 10000 : null;
+            const completeCoverage = yearData.length > 0 && healthData.length === yearData.length;
+            return completeCoverage && totalPop > 0 ? (totalCases / totalPop) * 10000 : null;
         });
         
         const esgotoTrend = years.map(year => {
@@ -228,7 +229,7 @@ const Charts = {
                 labels: years,
                 datasets: [
                     {
-                        label: 'Internações (por 10k)',
+                        label: 'CID A00–A09 (por 10k)',
                         data: internTrend,
                         borderColor: '#ec4899',
                         backgroundColor: 'rgba(236, 72, 153, 0.1)',
@@ -311,7 +312,7 @@ const Charts = {
                         position: 'left',
                         title: { 
                             display: true, 
-                            text: 'Internações/10k', 
+                            text: 'CID A00–A09/10k', 
                             color: '#ec4899',
                             font: { weight: 'bold' }
                         },

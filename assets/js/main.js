@@ -129,7 +129,8 @@ function initKPIs(data) {
     );
     const healthPop = healthData.reduce((s, d) => s + d.populacao, 0);
     const totalCases = healthData.reduce((s, d) => s + d.internacoes_hidricas_total, 0);
-    const taxaAvg = healthPop > 0 ? (totalCases / healthPop) * 10000 : null;
+    const healthCoverageComplete = data2023.length > 0 && healthData.length === data2023.length;
+    const taxaAvg = healthPop > 0 && healthCoverageComplete ? (totalCases / healthPop) * 10000 : null;
 
     const riscoData = data2023.filter(d => DataUtils.isAvailableNumber(d.risco_climatico));
     const riscoAvg = riscoData.length > 0
@@ -210,11 +211,11 @@ function renderMunicipalityCards(data) {
         // Generate insight phrase
         let insight = '';
         if (DataUtils.isAvailableNumber(aguaVal) && DataUtils.isAvailableNumber(internVal) && aguaVal > 80 && internVal > 5) {
-            insight = `Mesmo com ${aguaVal.toFixed(0)}% de água, as internações seguem em ${internVal.toFixed(1)}/10k hab.`;
+            insight = `Em 2023, a cobertura de água registrada é ${aguaVal.toFixed(0)}% e a taxa CID A00–A09 é ${internVal.toFixed(1)}/10k hab.; a associação não demonstra causalidade nem via de transmissão.`;
         } else if (DataUtils.isAvailableNumber(esgotoVal) && esgotoVal < 5) {
             insight = `A coleta de esgoto registrada é ${esgotoVal.toFixed(1)}%. Avalie o contexto e a cobertura dos dados.`;
         } else if (DataUtils.isAvailableNumber(internVal) && internVal > 6) {
-            insight = `Taxa de internação de ${internVal.toFixed(1)}/10k hab indica pressão no sistema de saúde.`;
+            insight = `Taxa registrada no grupo CID A00–A09: ${internVal.toFixed(1)}/10k hab.; a classificação não comprova transmissão hídrica.`;
         } else if (!DataUtils.isAvailableNumber(aguaVal) || !DataUtils.isAvailableNumber(esgotoVal) || !DataUtils.isAvailableNumber(internVal)) {
             insight = 'Há indicadores sem informação em 2023. Consulte a matriz de cobertura antes de comparar municípios.';
         } else {
@@ -388,7 +389,7 @@ function renderQuickReading(cityName, munData, record2023) {
     let html = '<ul style="margin: 0; padding-left: 1rem">';
     
     if (peakRecord) {
-        html += `<li><strong>Pico de internações em ${peakRecord.ano}:</strong> ${peakRecord.taxa_internacoes_hidricas_10k.toFixed(1)} por 10 mil hab.</li>`;
+        html += `<li><strong>Pico da taxa registrada CID A00–A09 em ${peakRecord.ano}:</strong> ${peakRecord.taxa_internacoes_hidricas_10k.toFixed(1)} por 10 mil hab.</li>`;
     }
     
     if (DataUtils.isAvailableNumber(agua2019) && DataUtils.isAvailableNumber(agua2023)) {
@@ -432,7 +433,7 @@ function renderModalChart(munData) {
             labels: years,
             datasets: [
                 {
-                    label: 'Internações/10k',
+                    label: 'CID A00–A09/10k',
                     data: internData,
                     borderColor: '#ec4899',
                     backgroundColor: 'rgba(236, 72, 153, 0.1)',
@@ -499,7 +500,7 @@ function renderModalChart(munData) {
                     position: 'left',
                     title: { 
                         display: true, 
-                        text: 'Internações/10k', 
+                        text: 'CID A00–A09/10k', 
                         color: '#ec4899',
                         font: { weight: 'bold' }
                     },
@@ -563,7 +564,8 @@ function renderComparisonBars(municipality, record2023) {
     );
     const healthPop = healthData.reduce((s, d) => s + d.populacao, 0);
     const totalCases = healthData.reduce((s, d) => s + d.internacoes_hidricas_total, 0);
-    const rmbIntern = healthPop > 0 ? (totalCases / healthPop) * 10000 : null;
+    const healthCoverageComplete = data2023.length > 0 && healthData.length === data2023.length;
+    const rmbIntern = healthPop > 0 && healthCoverageComplete ? (totalCases / healthPop) * 10000 : null;
 
     const munAgua = record2023?.cobertura_agua ?? null;
     const munEsgoto = record2023?.coleta_esgoto ?? null;
@@ -572,7 +574,7 @@ function renderComparisonBars(municipality, record2023) {
     const bars = [
         { label: 'Água', value: munAgua, max: 100, rmb: rmbAgua, color: 'cyan' },
         { label: 'Esgoto', value: munEsgoto, max: 100, rmb: rmbEsgoto, color: 'cyan' },
-        { label: 'Internações', value: munIntern, max: 40, rmb: rmbIntern, color: 'magenta' }
+        { label: 'CID A00–A09/10k', value: munIntern, max: 40, rmb: rmbIntern, color: 'magenta', isRate: true }
     ];
     
     container.innerHTML = bars.map(bar => {
@@ -585,7 +587,7 @@ function renderComparisonBars(municipality, record2023) {
             : '';
         const compColor = !hasValue || !hasReference
             ? 'var(--text-light-muted)'
-            : (bar.label === 'Internações'
+            : (bar.isRate
                 ? (bar.value > bar.rmb ? '#ec4899' : '#a3e635')
                 : (bar.value > bar.rmb ? '#a3e635' : '#ec4899'));
 
@@ -597,7 +599,7 @@ function renderComparisonBars(municipality, record2023) {
                     ${hasReference ? `<div title="Referência RMB: ${bar.rmb.toFixed(1)}" style="position: absolute; left: ${rmbWidth}%; top: 0; bottom: 0; width: 2px; background: #fbbf24; opacity: 0.8;"></div>` : ''}
                 </div>
                 <span class="comparison-bar-value" style="color: ${compColor}">
-                    ${hasValue ? `${bar.value.toFixed(1)}${bar.label !== 'Internações' ? '%' : ''}` : 'N/D'} ${comparison}
+                    ${hasValue ? `${bar.value.toFixed(1)}${bar.isRate ? '' : '%'}` : 'N/D'} ${comparison}
                 </span>
             </div>
         `;

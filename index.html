@@ -150,7 +150,7 @@
                     </p>
                     <p style="color: var(--text-dark-muted)">
                         Corredores de BRT e parques turísticos convivem com bairros em palafitas, 
-                        canais abertos e doenças 100% evitáveis.
+                        canais abertos e doenças infecciosas cujo risco pode ser reduzido por água segura e saneamento adequado.
                     </p>
                     <div class="context-question">
                         <i class="fas fa-question-circle mr-2"></i>
@@ -171,7 +171,7 @@
                     </p>
                     <p style="color: var(--text-dark-muted)">
                         Quanto desse dinheiro chega para resolver água e esgoto na RMB? 
-                        Quanto efetivamente reduz as internações por diarreia?
+                        Que evidências permitiriam avaliar se investimentos em saneamento estão associados a mudanças nas internações?
                     </p>
                     <div class="context-question">
                         <i class="fas fa-question-circle mr-2"></i>
@@ -185,9 +185,9 @@
                 <p class="font-medium" style="color: var(--text-dark)">
                     <i class="fas fa-exclamation-triangle mr-2" style="color: var(--accent-magenta)"></i>
                     <strong>Na prática, isso significa:</strong> A RMB pode ser vendida como "capital climática global", 
-                    enquanto <strong style="color: var(--accent-magenta)">apenas ~20% do esgoto é coletado</strong> 
-                    e <strong style="color: var(--accent-magenta)">mais de 1.200 internações por doenças hídricas</strong> 
-                    ainda ocorrem anualmente — doenças 100% evitáveis com saneamento básico.
+                    enquanto <strong style="color: var(--accent-magenta)">os indicadores de coleta de esgoto são baixos</strong>
+                    e <strong style="color: var(--accent-magenta)">mais de 1.200 internações com diagnóstico principal CID-10 A00–A09</strong>
+                    foram registradas em 2023 na versão atual da base, ainda em auditoria. Esse grupo abrange doenças intestinais infecciosas; o CID, isoladamente, não identifica a via de transmissão.
                 </p>
             </div>
         </div>
@@ -414,12 +414,12 @@
                     <div class="ods-icon ods-3">3</div>
                     <h3 class="font-bold text-lg mb-2">Saúde e Bem-estar</h3>
                     <p class="text-sm mb-4" style="color: var(--text-dark-muted)">
-                        Doenças hídricas são 100% evitáveis. Cada internação é uma falha de política pública.
+                        O saneamento e a água segura podem reduzir riscos de algumas infecções intestinais, mas o diagnóstico CID-10 não identifica, por si só, a via de transmissão nem permite atribuir cada internação a uma falha específica de política pública.
                     </p>
                     <ul class="text-sm text-left space-y-1" style="color: var(--text-dark-muted)">
-                        <li>• Internações por doenças hídricas</li>
+                        <li>• Internações com diagnóstico principal CID-10 A00–A09</li>
                         <li>• Taxa por 10 mil habitantes</li>
-                        <li>• CIDs A00-A09 (intestinais)</li>
+                        <li>• Doenças intestinais infecciosas; a via de transmissão não é identificada pelo código isolado</li>
                     </ul>
                 </div>
                 
@@ -467,7 +467,7 @@
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-value" style="color: var(--accent-orange)" id="kpi-disease">--</div>
-                        <div class="kpi-label">Internações/10k hab</div>
+                        <div class="kpi-label">CID A00–A09 / 10 mil hab.</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-value" style="color: var(--accent-gold)" id="kpi-risk">--</div>
@@ -477,8 +477,7 @@
                 
                 <p class="text-center text-sm mt-6" style="color: var(--text-light-muted)">
                     <i class="fas fa-info-circle mr-1"></i>
-                    <strong style="color: var(--accent-magenta)">Atenção:</strong> A média da RMB esconde desigualdade municipal brutal. 
-                    O resto do site mostra essa fissura.
+                    <strong style="color: var(--accent-magenta)">Atenção:</strong> A média da RMB esconde desigualdade municipal. A taxa usa CID-10 A00–A09 como proxy exploratório; o grupo não identifica a via de transmissão e os totais SIH seguem em auditoria.
                 </p>
             </div>
         </div>
@@ -499,7 +498,7 @@
                     
                     <p class="mb-4" style="color: var(--text-light-muted)">
                         Este gráfico revela a <strong class="text-white">correlação mortal</strong>: 
-                        menos saneamento = mais doenças. Cada bolha é um município da RMB.
+                        A distribuição compara coleta de esgoto e taxa de internações CID-10 A00–A09. Cada bolha é um município; os padrões são exploratórios, não causais.
                     </p>
                     
                     <div class="space-y-3 mb-6">
@@ -509,7 +508,7 @@
                         </div>
                         <div class="flex items-center gap-3 text-sm" style="color: var(--text-light-muted)">
                             <i class="fas fa-arrows-alt-v" style="color: var(--accent-magenta)"></i>
-                            <span><strong class="text-white">Eixo Y:</strong> Internações/10k hab. Cima = pior.</span>
+                            <span><strong class="text-white">Eixo Y:</strong> Taxa CID-10 A00–A09 por 10 mil hab. Acima da mediana é uma comparação relativa, não prova de transmissão hídrica.</span>
                         </div>
                         <div class="flex items-center gap-3 text-sm" style="color: var(--text-light-muted)">
                             <i class="fas fa-circle" style="color: var(--accent-gold)"></i>
@@ -523,7 +522,7 @@
                         </h4>
                         <p class="text-sm" style="color: var(--text-light-muted)">
                             O canto <strong class="text-white">superior esquerdo</strong> é onde ninguém quer estar: 
-                            alta taxa de doença + baixa cobertura de esgoto.
+                            taxa CID-10 A00–A09 acima da mediana + coleta de esgoto abaixo da mediana.
                         </p>
                     </div>
                     
@@ -573,7 +572,7 @@
                 </span>
                 <h2 class="mb-4">Linha do Tempo: 2017–2025</h2>
                 <p style="color: var(--text-dark-muted)">
-                    A evolução histórica não mente. Observe como a curva de internações (magenta) 
+                    A linha do tempo mostra as séries registradas. Observe a curva de internações CID-10 A00–A09 (magenta) 
                     reage — ou não — aos investimentos em esgoto (ciano) ao longo dos anos.
                 </p>
             </div>
@@ -586,7 +585,7 @@
                 <div class="chart-legend">
                     <div class="legend-item">
                         <div class="legend-dot" style="background: var(--accent-magenta)"></div>
-                        <span>Internações por 10k hab</span>
+                        <span>Internações CID-10 A00–A09 por 10 mil hab.</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-dot" style="background: var(--accent-cyan)"></div>
@@ -603,7 +602,7 @@
                 <div class="panel p-6">
                     <h4 class="font-bold mb-2">📊 Leitura do gráfico</h4>
                     <p class="text-sm" style="color: var(--text-dark-muted)">
-                        A faixa sombreada (2019–2023) representa a janela de dados robustos e aceleração de obras.
+                        A faixa sombreada (2019–2023) destaca um período de comparação; a cobertura e a qualidade das séries precisam ser consideradas.
                         A linha dourada em 2025 marca a COP30. 
                         <strong>Observe:</strong> a curva de internações (magenta) acompanha — ou não — os investimentos em esgoto (ciano).
                     </p>
@@ -611,9 +610,8 @@
                 <div class="panel p-6" style="border-left: 3px solid var(--accent-magenta)">
                     <h4 class="font-bold mb-2" style="color: var(--accent-magenta)">⚠️ O que isso significa</h4>
                     <p class="text-sm" style="color: var(--text-dark-muted)">
-                        <strong>Se a curva de obras sobe mas a curva de internações não cai na mesma proporção, 
-                        existe descompasso entre infraestrutura entregue e efeito em saúde pública.</strong>
-                        O legado real se mede em vidas, não em quilômetros de tubos.
+                        Mudanças simultâneas nas séries podem sugerir perguntas para investigação, mas não demonstram que obras causaram aumento ou redução das internações.
+                        Uma avaliação de impacto exige dados comparáveis, controle de outros fatores e desenho analítico adequado.
                     </p>
                 </div>
             </div>
@@ -680,7 +678,7 @@
                     
                     <p class="text-xs mt-3" style="color: var(--text-light-muted)">
                         <i class="fas fa-lightbulb mr-1" style="color: var(--accent-gold)"></i>
-                        <strong>Cada célula cinza é um ano em que a RMB discute saneamento e saúde com base em percepção, não em dados.</strong>
+                        <strong>Cada célula cinza indica ausência de informação para aquele indicador/ano na base consolidada. Ausência de dado não significa ausência de problema.</strong>
                     </p>
                 </div>
                 
@@ -767,7 +765,7 @@
                     <p>O que posso cobrar na audiência pública? Leve estas 3 perguntas para sua câmara municipal:</p>
                     <ul class="text-sm space-y-1 mb-4" style="color: var(--text-light-muted)">
                         <li>1. Qual a meta de esgoto para 2025?</li>
-                        <li>2. Quantas internações hídricas tivemos?</li>
+                        <li>2. Quantas internações com diagnóstico principal CID-10 A00–A09 foram registradas?</li>
                         <li>3. Por que não enviamos dados ao SNIS?</li>
                     </ul>
                 </div>
@@ -800,7 +798,7 @@
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fas fa-database mt-1" style="color: var(--accent-cyan)"></i>
-                            <span><strong>DATASUS (SIH):</strong> Internações hospitalares por CIDs A00–A09</span>
+                            <span><strong>DATASUS (SIH):</strong> Internações hospitalares com diagnóstico principal CID-10 A00–A09 (doenças intestinais infecciosas)</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fas fa-database mt-1" style="color: var(--accent-cyan)"></i>
@@ -810,17 +808,16 @@
                     
                     <h4 class="font-bold mb-3">Critérios</h4>
                     <ul class="space-y-2 mb-6" style="color: var(--text-dark-muted)">
-                        <li>• <strong>Doenças hídricas:</strong> CIDs A00–A09 (doenças intestinais infecciosas)</li>
+                        <li>• <strong>Proxy epidemiológico exploratório:</strong> CID-10 A00–A09 (doenças intestinais infecciosas); não implica transmissão hídrica em todos os casos</li>
                         <li>• <strong>Taxa padronizada:</strong> Internações por 10 mil habitantes</li>
-                        <li>• <strong>Janela temporal:</strong> 2017–2025 (projeções para 2024-25)</li>
+                        <li>• <strong>Janela temporal:</strong> 2017–2025; indicadores de saneamento ausentes no CSV em 2017, 2018, 2024 e 2025</li>
                         <li>• <strong>Escopo:</strong> 7 municípios da Região Metropolitana de Belém</li>
                     </ul>
                     
                     <div class="alert-box alert-info">
                         <p class="text-sm">
                             <i class="fas fa-shield-alt mr-2" style="color: var(--accent-cyan)"></i>
-                            <strong>Compromisso:</strong> Nenhum dado de saneamento ou saúde foi inventado ou completado por IA. 
-                            Lacunas foram mantidas como null para preservar a integridade da análise.
+                            <strong>Nota de qualidade:</strong> lacunas de saneamento permanecem como ausentes. Os totais SIH estão em auditoria: a rotina anterior podia converter ausência de correspondência em zero. Consulte a proveniência antes de interpretar taxas ou comparações.
                         </p>
                     </div>
                 </div>
@@ -1022,7 +1019,7 @@
                     </div>
                     <div class="modal-kpi">
                         <div class="modal-kpi-value magenta" id="modalIntern">--</div>
-                        <div class="modal-kpi-label">Internações/10k</div>
+                        <div class="modal-kpi-label">CID A00–A09/10k</div>
                     </div>
                     <div class="modal-kpi">
                         <div class="modal-kpi-value orange" id="modalRisco">--</div>
@@ -1042,7 +1039,7 @@
                     <div class="modal-legend">
                         <div class="modal-legend-item">
                             <div class="modal-legend-dot" style="background: var(--accent-magenta)"></div>
-                            <span>Internações/10k hab</span>
+                            <span>Internações CID-10 A00–A09/10 mil hab.</span>
                         </div>
                         <div class="modal-legend-item">
                             <div class="modal-legend-dot" style="background: var(--accent-cyan)"></div>
