@@ -241,7 +241,7 @@ Uso livre com atribuição ao autor.
 ## 👤 Autor
 
 **Eric Pimentel**  
-Engenheiro, Cientista de Dados e pesquisador em Inteligência Artificial aplicada à Sustentabilidade.
+Engenheiro eletricista e profissional de saneamento, com formação em desenvolvimento de software e especialização em Ciência de Dados em andamento; desenvolve projetos em IA aplicada à sustentabilidade.
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ericpimentel-dados/)
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/enps2015)
