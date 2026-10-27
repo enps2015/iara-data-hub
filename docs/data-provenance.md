@@ -57,9 +57,15 @@ O CSV consolidado tem indicadores de saneamento ausentes em 2017, 2018, 2024 e 2
 
 A documentação oficial do Ministério das Cidades informa a transição entre o SNIS até 2023 e o SINISA a partir da coleta referente a 2024. Ao integrar períodos, documentar separadamente sistema, indicador, unidade e referência temporal; não assumir continuidade metodológica automática. [SNIS/SINISA — área do prestador e municípios](https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/saneamento/snis/area-do-prestador-e-municipios).
 
-## Saúde
+## Saúde — SIH/DATASUS
 
-O pipeline registrado em `scripts/build_iara_municipios_rmb.py` filtra o campo `DIAG_PRINC` por prefixo `A0` e agrega por município de residência e ano. Ainda é necessário documentar os arquivos SIH/DATASUS usados, datas de extração, cobertura, critérios de inclusão e limitações. Até a conferência dessas fontes, tratar os totais e a taxa derivada como dados em auditoria.
+O pipeline registrado em `scripts/build_iara_municipios_rmb.py` seleciona internações cujo diagnóstico principal pertence ao grupo CID-10 A00–A09 e agrega os registros por município de residência e ano. Na CID-10, A00–A09 corresponde a **doenças intestinais infecciosas** (incluindo, por exemplo, infecções bacterianas, doenças por protozoários, infecções virais e gastroenterite infecciosa presumível). Esse agrupamento **não prova que cada internação tenha sido transmitida pela água** nem permite atribuir sua causa individual ao saneamento. Fonte de classificação: [CID-10 brasileira — Ministério da Saúde/RNDS](https://fhir.saude.gov.br/rira/en/CodeSystem-BRCID10.html).
+
+O DATASUS publica arquivos SIH/RD separados por local de internação e por local de residência; o pipeline procura arquivos `RDPA*.csv` e utiliza `MUNIC_RES`, ou seja, município de residência. A origem exata, os nomes e hashes dos arquivos usados na série consolidada ainda precisam ser inventariados. Referência de acesso: [DATASUS — Produção Hospitalar SIH/SUS](https://datasus.saude.gov.br/acesso-a-informacao/producao-hospitalar-sih-sus/).
+
+O código de construção agora deixa explícitos erros de leitura/estrutura em vez de ignorar silenciosamente arquivos SIH inválidos, valida campos essenciais nas internações A00–A09 e preserva ausência de correspondência como valor ausente, não zero. Isso melhora o comportamento do ETL, mas não valida retroativamente os totais históricos já publicados. **As contagens da série consolidada continuam em auditoria até que os arquivos brutos, a cobertura temporal e possíveis sobreposições entre arquivos sejam conferidos.**
+
+A taxa `taxa_internacoes_hidricas_10k` é calculada como `internacoes_hidricas_total / populacao * 10000` quando ambos os campos estão disponíveis e a população é positiva. A consistência aritmética da fórmula não comprova integridade da contagem de internações nem causalidade entre saneamento e saúde.
 
 ## Clima
 
