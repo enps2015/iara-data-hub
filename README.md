@@ -42,7 +42,7 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 
 ### Padrões exploratórios a investigar
 
-- **Saneamento × Saúde**: o projeto permite explorar associações entre cobertura de esgoto e taxas de internações por doenças hídricas. Esses padrões são descritivos e, por si sós, **não demonstram causalidade**.
+- **Saneamento × Saúde**: o projeto permite explorar associações entre cobertura de esgoto e internações hospitalares cujo diagnóstico principal está no grupo CID-10 A00–A09 (doenças intestinais infecciosas). Esse agrupamento não identifica, por si só, transmissão pela água nem estabelece causalidade.
 - **Lacunas de dados**: a série consolidada abrange 2017–2025, mas a disponibilidade varia conforme o indicador e o ano. Em 2023, três dos sete municípios não têm coleta de esgoto informada; comparações entre indicadores devem usar apenas registros compatíveis e informar a cobertura efetiva.
 - **Diferenças entre municípios**: as visualizações permitem comparar padrões observados na Região Metropolitana de Belém. A classificação em quadrantes ou zonas é relativa aos dados e critérios escolhidos, não um diagnóstico absoluto de qualidade sanitária.
 
@@ -81,7 +81,7 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 
 ### Análises planejadas:
 
-- [ ] **Correlação clima × internações**: Cruzar dados de pluviometria com picos de doenças hídricas
+- [ ] **Clima × internações**: explorar a relação temporal entre pluviometria e internações CID-10 A00–A09, após validar cobertura e proveniência dos dois conjuntos de dados
 - [ ] **Análise de custo-efetividade**: Quanto cada R$1 em saneamento economiza em internações?
 - [ ] **Comparação nacional**: Posicionar a RMB em relação a outras regiões metropolitanas brasileiras
 - [ ] **Previsão com ML**: Modelo preditivo de internações baseado em cobertura de saneamento
@@ -107,7 +107,7 @@ O IARA nasceu dessa necessidade: **um observatório crítico que não repete dis
 | ----------------- | --------------------------------------- | --------- |
 | **IBGE / FAPESPA** | Estimativas anuais (2017–2021), Censo (2022), referência transportada (2023), estimativas (2024–2025) | 2017–2025 |
 | **SNIS**          | Água, Esgoto, Tarifas                   | 2017–2023 |
-| **DATASUS (SIH)** | Internações hospitalares (CIDs A00-A09) | 2017-2025 |
+| **DATASUS (SIH)** | Internações hospitalares por diagnóstico principal CID-10 A00–A09 (doenças intestinais infecciosas; via de transmissão não inferida) | 2017–2025* |
 | **INMET**         | Dados climáticos históricos             | 2017-2023 |
 
 *Nota: 2023 repete a população censitária de 2022 como denominador de referência, pois a FAPESPA informa que não houve estimativa municipal do IBGE para 2023. Consulte [a proveniência e as fontes](docs/data-provenance.md).*
