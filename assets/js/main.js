@@ -129,7 +129,8 @@ function initKPIs(data) {
     );
     const healthPop = healthData.reduce((s, d) => s + d.populacao, 0);
     const totalCases = healthData.reduce((s, d) => s + d.internacoes_hidricas_total, 0);
-    const taxaAvg = healthPop > 0 ? (totalCases / healthPop) * 10000 : null;
+    const healthCoverageComplete = data2023.length > 0 && healthData.length === data2023.length;
+    const taxaAvg = healthPop > 0 && healthCoverageComplete ? (totalCases / healthPop) * 10000 : null;
 
     const riscoData = data2023.filter(d => DataUtils.isAvailableNumber(d.risco_climatico));
     const riscoAvg = riscoData.length > 0
