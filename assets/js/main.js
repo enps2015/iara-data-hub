@@ -348,8 +348,9 @@ function renderQuickReading(cityName, munData, record2023) {
     if (!container) return;
     
     // Find peak internations
-    const peakRecord = munData.filter(d => d.taxa_internacoes_hidricas_10k > 0)
-        .sort((a, b) => (b.taxa_internacoes_hidricas_10k || 0) - (a.taxa_internacoes_hidricas_10k || 0))[0];
+    const peakRecord = munData
+        .filter(d => DataUtils.isAvailableNumber(d.taxa_internacoes_hidricas_10k) && d.taxa_internacoes_hidricas_10k > 0)
+        .sort((a, b) => b.taxa_internacoes_hidricas_10k - a.taxa_internacoes_hidricas_10k)[0];
     
     // Find water trend
     const agua2019 = munData.find(d => d.ano === 2019)?.cobertura_agua ?? null;
