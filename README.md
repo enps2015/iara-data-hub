@@ -152,41 +152,54 @@ npx serve .
 
 ```
 iara-data-hub/
-├── index.html              # Página principal
+├── index.html
 ├── assets/
-│   ├── css/
-│   │   └── styles.css      # Estilos do site
-│   ├── js/
-│   │   ├── main.js         # Lógica principal
-│   │   ├── charts.js       # Visualizações (Chart.js)
-│   │   └── data.js         # Utilitários de dados
-│   └── data/
-│       └── iara_municipios_rmb.json  # Dados consolidados
-├── img/                    # Imagens do site
-└── README.md
+│   ├── css/styles.css
+│   └── js/
+│       ├── dataUtils.js    # Leitura, parsing e relatório de qualidade
+│       ├── charts.js       # Gráficos e matriz de disponibilidade
+│       ├── main.js         # KPIs, cards e detalhes por município
+│       └── storytelling.js # Narrativa e apoio à navegação
+├── data/iara/
+│   └── iara_municipios_rmb.csv
+├── img/
+├── tests/
+│   └── dataUtils.test.cjs
+└── .github/workflows/
+    └── data-quality.yml    # CI de sintaxe e qualidade dos dados
 ```
 
 ---
 
-## 🔄 Como Atualizar os Dados
+## 🧪 Qualidade dos dados e testes
 
-1. Edite o arquivo `assets/data/iara_municipios_rmb.json`
-2. Adicione novos registros seguindo o formato:
+Valores ausentes nos indicadores são preservados como `null` e apresentados como **N/D**. Um zero numérico válido continua sendo zero. O parser não deve preencher lacunas com zero, porque isso distorce médias, rankings e comparações entre municípios.
 
-```json
-{
-  "municipio": "Belém (PA)",
-  "ano": 2024,
-  "populacao": 1500000,
-  "cobertura_agua": 85.5,
-  "coleta_esgoto": 22.3,
-  "internacoes_hidricas_total": 450,
-  "taxa_internacoes_hidricas_10k": 3.0,
-  "risco_climatico": 0.85
-}
+Ao carregar o CSV, a aplicação registra um resumo de qualidade com contagem de registros, células vazias e valores numéricos inválidos. Registros com formato de CSV inconsistente são rejeitados com uma mensagem explícita, em vez de deslocar silenciosamente os campos.
+
+### Executar os testes locais
+
+Requer Node.js 22 ou compatível com o módulo de testes nativo:
+
+```bash
+node --check assets/js/dataUtils.js
+node --check assets/js/charts.js
+node --check assets/js/main.js
+node --test tests/dataUtils.test.cjs
 ```
 
-3. Os gráficos serão atualizados automaticamente ao recarregar a página.
+O GitHub Actions executa as mesmas verificações em pull requests e em alterações relevantes na aplicação ou no CSV.
+
+## 🔄 Como Atualizar os Dados
+
+Atualize `data/iara/iara_municipios_rmb.csv), mantendo o cabeçalho e uma linha por município/ano. Use o mesmo esquema de colunas do arquivo atual.
+
+- Campo sem informação: deixe vazio; a aplicação exibirá `N/D`.
+- Zero conhecido: informe `0`.
+- Valor numérico: use ponto como separador decimal.
+- Município com vírgula ou aspas: mantenha o campo entre aspas, de acordo com as regras de CSV.
+
+Depois de alterar os dados, execute `node --test tests/dataUtils.test.cjs` e confira o relatório de qualidade no painel. Os gráficos são recalculados a partir dos registros carregados.
 
 ---
 
