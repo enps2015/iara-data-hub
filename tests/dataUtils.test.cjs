@@ -107,3 +107,12 @@ test('loadData informa erro de rede e retorna conjunto vazio', async () => {
         console.error = originalConsoleError;
     }
 });
+
+test('JSON publicado permanece sincronizado com o CSV consolidado', () => {
+    const csvPath = path.join(__dirname, '..', 'data', 'iara', 'iara_municipios_rmb.csv');
+    const jsonPath = path.join(__dirname, '..', 'data', 'iara', 'iara_municipios_rmb.json');
+    const csvRecords = DataUtils.parseCSV(fs.readFileSync(csvPath, 'utf8'));
+    const jsonRecords = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+
+    assert.deepEqual(jsonRecords, csvRecords);
+});
