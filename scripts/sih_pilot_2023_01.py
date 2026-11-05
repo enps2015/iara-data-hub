@@ -163,33 +163,38 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
                 f"Datasets encontrados: {[dataset.name for dataset in datasets]}"
             )
 
-        # PySUS's FTP search returned no files even though the FTP endpoint
-        # connected. Inspect the official SIH/RD directory listing directly.
+        # Query by monthly filename prefix; avoid scanning the entire directory.
         ftp_directory = "/dissemin/publicos/SIHSUS/200801_/Dados"
         ftp.ftp.cwd(ftp_directory)
-        remote_names = ftp.ftp.nlst()
-        sample_names = [Path(str(name)).name for name in remote_names[:40]]
         log.info(
-            "FTP oficial conectado; PWD=%s; diretório SIH listado: %d entradas em %s.",
-            ftp.ftp.pwd(), len(remote_names), ftp_directory
+            "FTP oficial conectado; PWD=%s; consultando prefixos mensais em %s.",
+            ftp.ftp.pwd(), ftp_directory
         )
-        log.info("Amostra de nomes no diretório FTP: %s", sample_names)
 
         for uf in UFS:
             row = {
                 "uf": uf, "arquivos_listados": 0, "arquivos_baixados": 0,
                 "status": "pendente", "erro": "",
             }
+            prefix = f"RD{uf}{str(YEAR)[-2:]}{MONTH:02d}"
             expected = re.compile(
-                rf"^RD{uf}{str(YEAR)[-2:]}{MONTH:02d}(?:_\d+)?\.DBC$",
+                rf"^{re.escape(prefix)}(?:_\d+)?\.DBC$",
                 re.IGNORECASE,
             )
+            try:
+                candidates = ftp.ftp.nlst(f"{prefix}*")
+            except Exception as exc:
+                candidates = []
+                if "550" not in str(exc):
+                    raise
             names = sorted({
-                Path(str(name)).name
-                for name in remote_names
-                if expected.fullmatch(Path(str(name)).name)
+                Path(str(name).replace("\\", "/")).name
+                for name in candidates
+                if expected.fullmatch(Path(str(name).replace("\\", "/")).name)
             })
             row["arquivos_listados"] = len(names)
+            log.info("%s: prefixo %s* retornou %d DBC(s): %s",
+                     uf, prefix, len(names), names[:10])
 
             if not names:
                 row["status"] = "nenhum_dbc_listado"
@@ -293,7 +298,6 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
         "ufs_solicitadas": UFS,
         "ufs_com_arquivos": sorted(listed_ufs),
         "ufs_sem_dbc_listado": missing_ufs,
-        "total_entradas_diretorio_ftp": len(remote_names),
         "total_dbc_listados": len(inventory),
         "total_dbc_baixados": int(
             (inventory_df.get("status_download", pd.Series(dtype=str)) == "baixado").sum()
@@ -305,7 +309,7 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
         "total_erros": len(errors),
         "completo": not errors and not missing_ufs,
         "nota": (
-            "Arquivos descobertos por NLST direto no diretório FTP SIH/RD. "
+            "Arquivos descobertos por NLST com prefixo mensal no FTP SIH/RD. "
             "Competência de processamento não equivale ao ano civil de DT_INTER. "
             "Nenhuma linha individual nem N_AIH foi exportada nos relatórios."
         ),
