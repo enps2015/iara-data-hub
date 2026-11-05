@@ -145,6 +145,8 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
     os.environ["PYSUS_CACHEPATH"] = str(cache)
 
     from pysus.api.ftp.client import FTP
+    from pysus.api.ftp.databases import SIH
+    from pysus.api.ftp.models import Directory
     from pysus.api.models import BaseRemoteFile, BaseRemoteGroup
 
     inventory: list[dict[str, Any]] = []
@@ -155,14 +157,16 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
     ftp = FTP(timeout=45)
     try:
         await ftp.connect()
-        datasets = await ftp.datasets()
-        sih = next((dataset for dataset in datasets if dataset.name.upper() == "SIH"), None)
-        if sih is None:
-            raise RuntimeError("O FTP conectou, mas o conjunto SIH não foi anunciado.")
-
-        # PySUS's documented dataset.content traverses the two official SIH
-        # directories and parses filename metadata (group, UF, year, month).
+        # The IARA series starts in 2017. Restrict discovery to the modern
+        # SIH directory (2008 onward), avoiding the legacy 1992–2007 archive.
+        sih = SIH(
+            client=ftp,
+            paths=[Directory("/dissemin/publicos/SIHSUS/200801_/Dados")],
+        )
+        log.info("Iniciando listagem PySUS do diretório SIH 200801_/Dados.")
+        # PySUS parses the official DBC filename metadata (group, UF, year, month).
         content = await sih.content
+        log.info("Listagem PySUS concluída: %d entradas no diretório moderno.", len(content))
         remote_files: list[BaseRemoteFile] = []
         for item in content:
             if isinstance(item, BaseRemoteFile):
