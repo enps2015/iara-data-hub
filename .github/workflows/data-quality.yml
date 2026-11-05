@@ -26,6 +26,10 @@ on:
       - ".github/workflows/data-quality.yml"
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -65,3 +69,42 @@ jobs:
 
       - name: Executar testes do parser e da qualidade de dados
         run: node --test tests/dataUtils.test.cjs
+
+
+  sih_pilot:
+    name: Piloto SIH-RD nacional (2023-01)
+    if: github.event_name == 'pull_request' && github.head_ref == 'audit/sih-pilot-2023-01'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências do piloto
+        run: python -m pip install --disable-pip-version-check pandas "pysus==2.11.7"
+
+      - name: Testar funções de filtragem e agregação
+        run: python -m unittest discover -s tests -p 'test_sih_pilot_2023_01.py' -v
+
+      - name: Executar extração SIH-RD em todas as UFs
+        run: python scripts/sih_pilot_2023_01.py --output ./sih_pilot_output
+
+      - name: Publicar somente relatórios agregados e proveniência
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iara-sih-pilot-2023-01-audit
+          path: |
+            sih_pilot_output/inventario_dbc.csv
+            sih_pilot_output/cobertura_arquivos_por_uf.csv
+            sih_pilot_output/resumo_por_municipio_uf_ident.csv
+            sih_pilot_output/repeticoes_n_aih_resumo.csv
+            sih_pilot_output/erros_execucao.csv
+            sih_pilot_output/metadados_execucao.json
+          if-no-files-found: warn
+          retention-days: 7
