@@ -50,6 +50,11 @@ class SihPilotTests(unittest.TestCase):
         self.assertTrue(result["ano_dt_inter"].astype("Int64").eq(2023).all())
         self.assertTrue(result["dt_inter_valida"].all())
 
+    def test_recognizes_part_split_dbc_filename(self):
+        result = MODULE.filter_rmb_records(self.frame, "RDPA2301_2.dbc")
+        self.assertEqual(len(result), 2)
+        self.assertTrue(result["uf_processamento"].eq("PA").all())
+
     def test_preserves_ident_without_excluding_any_type(self):
         result = MODULE.filter_rmb_records(self.frame, "RDPA2301.dbc")
         self.assertEqual(set(result["IDENT"].astype(str)), {"1", "5"})
