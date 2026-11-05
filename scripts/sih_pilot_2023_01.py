@@ -168,10 +168,12 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
         ftp_directory = "/dissemin/publicos/SIHSUS/200801_/Dados"
         ftp.ftp.cwd(ftp_directory)
         remote_names = ftp.ftp.nlst()
+        sample_names = [Path(str(name)).name for name in remote_names[:40]]
         log.info(
-            "FTP oficial conectado; diretório SIH listado: %d entradas em %s.",
-            len(remote_names), ftp_directory
+            "FTP oficial conectado; PWD=%s; diretório SIH listado: %d entradas em %s.",
+            ftp.ftp.pwd(), len(remote_names), ftp_directory
         )
+        log.info("Amostra de nomes no diretório FTP: %s", sample_names)
 
         for uf in UFS:
             row = {
