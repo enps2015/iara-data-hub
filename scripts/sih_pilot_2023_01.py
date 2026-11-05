@@ -77,7 +77,7 @@ def filter_rmb_records(frame: pd.DataFrame, filename: str) -> pd.DataFrame:
     selected["MUNIC_RES"] = residence.loc[mask]
     selected["cod_ibge"] = selected["MUNIC_RES"].map({k: v[0] for k, v in MUNICIPIOS.items()})
     selected["municipio"] = selected["MUNIC_RES"].map({k: v[1] for k, v in MUNICIPIOS.items()})
-    match = re.match(r"^RD([A-Z]{2})\d{4}\.DBC$", Path(filename).name.upper())
+    match = re.match(r"^RD([A-Z]{2})\d{4}(?:_\d+)?\.DBC$", Path(filename).name.upper())
     selected["uf_processamento"] = match.group(1) if match else pd.NA
     selected["arquivo_origem"] = Path(filename).name
 
