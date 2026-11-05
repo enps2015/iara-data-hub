@@ -152,7 +152,7 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
     selected_frames: list[pd.DataFrame] = []
     errors: list[dict[str, str]] = []
 
-    ftp = FTP(timeout=90)
+    ftp = FTP(timeout=25)
     try:
         await ftp.connect()
         datasets = await ftp.datasets()
@@ -165,7 +165,7 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
 
         # Query exact monthly DBC names with FTP SIZE. This avoids a costly
         # full directory listing or wildcard expansion on the legacy server.
-        ftp_directory = "/dissemin/publicos/SIHSUS/200801_/Dados"
+        ftp_directory = "/dissemin/publicos/SIHSUS/200801_/Dados/RD"
         ftp.ftp.cwd(ftp_directory)
         log.info(
             "FTP oficial conectado; PWD=%s; consultando nomes exatos por SIZE em %s.",
@@ -311,7 +311,7 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
         "total_erros": len(errors),
         "completo": not errors and not missing_ufs,
         "nota": (
-            "Arquivos identificados por FTP SIZE com nome mensal exato no SIH/RD. "
+            "Arquivos identificados por FTP SIZE no subdiretório RD do SIH. "
             "Competência de processamento não equivale ao ano civil de DT_INTER. "
             "Nenhuma linha individual nem N_AIH foi exportada nos relatórios."
         ),
