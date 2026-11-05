@@ -163,11 +163,12 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
                 f"Datasets encontrados: {[dataset.name for dataset in datasets]}"
             )
 
-        # Query by monthly filename prefix; avoid scanning the entire directory.
+        # Query exact monthly DBC names with FTP SIZE. This avoids a costly
+        # full directory listing or wildcard expansion on the legacy server.
         ftp_directory = "/dissemin/publicos/SIHSUS/200801_/Dados"
         ftp.ftp.cwd(ftp_directory)
         log.info(
-            "FTP oficial conectado; PWD=%s; consultando prefixos mensais em %s.",
+            "FTP oficial conectado; PWD=%s; consultando nomes exatos por SIZE em %s.",
             ftp.ftp.pwd(), ftp_directory
         )
 
@@ -176,25 +177,26 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
                 "uf": uf, "arquivos_listados": 0, "arquivos_baixados": 0,
                 "status": "pendente", "erro": "",
             }
-            prefix = f"RD{uf}{str(YEAR)[-2:]}{MONTH:02d}"
-            expected = re.compile(
-                rf"^{re.escape(prefix)}(?:_\d+)?\.DBC$",
-                re.IGNORECASE,
-            )
-            try:
-                candidates = ftp.ftp.nlst(f"{prefix}*")
-            except Exception as exc:
-                candidates = []
-                if "550" not in str(exc):
+            stem = f"RD{uf}{str(YEAR)[-2:]}{MONTH:02d}"
+            names: list[str] = []
+            remote_sizes: dict[str, int | None] = {}
+            for candidate in (f"{stem}.dbc", f"{stem}.DBC"):
+                try:
+                    size = ftp.ftp.size(candidate)
+                except Exception as exc:
+                    # 550 is the normal FTP response for a name not found.
+                    # Any other response is a connection/protocol error.
+                    if "550" in str(exc):
+                        continue
                     raise
-            names = sorted({
-                Path(str(name).replace("\\", "/")).name
-                for name in candidates
-                if expected.fullmatch(Path(str(name).replace("\\", "/")).name)
-            })
+                if size is not None:
+                    names.append(candidate)
+                    remote_sizes[candidate] = int(size)
+
+            names = sorted(set(names))
             row["arquivos_listados"] = len(names)
-            log.info("%s: prefixo %s* retornou %d DBC(s): %s",
-                     uf, prefix, len(names), names[:10])
+            log.info("%s: SIZE encontrou %d arquivo(s): %s",
+                     uf, len(names), names)
 
             if not names:
                 row["status"] = "nenhum_dbc_listado"
@@ -208,7 +210,7 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
                     "uf_consultada": uf,
                     "nome": name,
                     "caminho_remoto": f"{ftp_directory}/{name}",
-                    "tamanho_remoto_bytes": "",
+                    "tamanho_remoto_bytes": remote_sizes.get(name, ""),
                     "modificado_remoto": "",
                     "grupo": "RD",
                     "status_download": "pendente",
@@ -309,7 +311,7 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
         "total_erros": len(errors),
         "completo": not errors and not missing_ufs,
         "nota": (
-            "Arquivos descobertos por NLST com prefixo mensal no FTP SIH/RD. "
+            "Arquivos identificados por FTP SIZE com nome mensal exato no SIH/RD. "
             "Competência de processamento não equivale ao ano civil de DT_INTER. "
             "Nenhuma linha individual nem N_AIH foi exportada nos relatórios."
         ),
