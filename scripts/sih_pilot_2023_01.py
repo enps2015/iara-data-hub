@@ -139,15 +139,14 @@ def write_csv(frame: pd.DataFrame, path: Path) -> None:
 
 
 async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
-    """Discover and download the Jan/2023 RD files through PySUS's FTP API."""
+    """Retrieve exact monthly SIH-RD filenames without listing the full FTP archive."""
+    from ftplib import error_perm
+    from pysus.api.ftp.client import FTP
+    from pysus.api.extensions import DBC
+
     cache = output / ".pysus_cache"
     cache.mkdir(exist_ok=True)
     os.environ["PYSUS_CACHEPATH"] = str(cache)
-
-    from pysus.api.ftp.client import FTP
-    from pysus.api.ftp.databases import SIH
-    from pysus.api.ftp.models import Directory
-    from pysus.api.models import BaseRemoteFile, BaseRemoteGroup
 
     inventory: list[dict[str, Any]] = []
     coverage: list[dict[str, Any]] = []
@@ -157,109 +156,108 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
     ftp = FTP(timeout=45)
     try:
         await ftp.connect()
-        # The IARA series starts in 2017. Restrict discovery to the modern
-        # SIH directory (2008 onward), avoiding the legacy 1992–2007 archive.
-        sih = SIH(
-            client=ftp,
-            paths=[Directory("/dissemin/publicos/SIHSUS/200801_/Dados")],
-        )
-        log.info("Iniciando listagem PySUS do diretório SIH 200801_/Dados.")
-        # PySUS parses the official DBC filename metadata (group, UF, year, month).
-        content = await sih.content
-        log.info("Listagem PySUS concluída: %d entradas no diretório moderno.", len(content))
-        remote_files: list[BaseRemoteFile] = []
-        for item in content:
-            if isinstance(item, BaseRemoteFile):
-                remote_files.append(item)
-            elif isinstance(item, BaseRemoteGroup):
-                remote_files.extend(await item.files)
-
-        log.info("FTP DATASUS: %d entradas SIH recebidas via PySUS.", len(content))
+        ftp_directory = "/dissemin/publicos/SIHSUS/200801_/Dados"
+        ftp.ftp.cwd(ftp_directory)
         log.info(
-            "FTP DATASUS: %d arquivos remotos; amostra: %s",
-            len(remote_files),
-            [file.name for file in remote_files[:15]],
+            "FTP DATASUS conectado. Recuperação direta de nomes mensais em %s.",
+            ftp_directory,
         )
 
-        monthly_files = [
-            file for file in remote_files
-            if getattr(file, "year", None) == YEAR
-            and getattr(file, "month", None) == MONTH
-            and str(getattr(getattr(file, "group", None), "name", "")).upper() == "RD"
-            and str(getattr(file, "state", "")).upper() in UFS
-        ]
+        def retrieve_exact(name: str) -> Path | None:
+            """Retrieve a known filename. A 550 response means it is not present."""
+            local_path = cache / name
+            try:
+                with local_path.open("wb") as output_file:
+                    ftp.ftp.retrbinary(
+                        f"RETR {name}",
+                        output_file.write,
+                        blocksize=1024 * 1024,
+                    )
+            except error_perm as exc:
+                local_path.unlink(missing_ok=True)
+                if str(exc).lstrip().startswith("550"):
+                    return None
+                raise
 
-        by_uf: dict[str, list[BaseRemoteFile]] = {uf: [] for uf in UFS}
-        for remote in monthly_files:
-            by_uf[str(remote.state).upper()].append(remote)
-
-        log.info(
-            "FTP DATASUS: %d DBCs RD identificados para %04d-%02d.",
-            len(monthly_files), YEAR, MONTH
-        )
+            if not local_path.is_file() or local_path.stat().st_size == 0:
+                local_path.unlink(missing_ok=True)
+                raise ValueError(f"Download vazio ou inexistente: {name}")
+            return local_path
 
         for uf in UFS:
-            files = sorted(by_uf[uf], key=lambda item: item.name)
+            stem = f"RD{uf}{str(YEAR)[-2:]}{MONTH:02d}"
             row = {
                 "uf": uf,
-                "arquivos_listados": len(files),
+                "arquivos_listados": 0,
                 "arquivos_baixados": 0,
-                "status": "nenhum_arquivo_listado" if not files else "pendente",
+                "status": "pendente",
                 "erro": "",
             }
-            if not files:
-                coverage.append(row)
-                log.warning("%s: nenhum DBC RD para %04d-%02d no catálogo FTP.", uf, YEAR, MONTH)
-                continue
 
-            for remote in files:
-                inv = {
+            # Normal file first. DATASUS splits oversized files as _1, _2, ...
+            # If the unsplit name is absent, probe the numbered parts.
+            found: list[tuple[str, Path]] = []
+            base_name = f"{stem}.dbc"
+            try:
+                base_path = retrieve_exact(base_name)
+                if base_path is not None:
+                    found.append((base_name, base_path))
+                else:
+                    for part in range(1, 11):
+                        part_name = f"{stem}_{part}.dbc"
+                        part_path = retrieve_exact(part_name)
+                        if part_path is not None:
+                            found.append((part_name, part_path))
+            except Exception as exc:
+                message = f"{type(exc).__name__}: {exc}"
+                row["erro"] = message
+                errors.append({"uf": uf, "arquivo": base_name, "erro": message})
+                log.exception("Falha ao recuperar arquivos SIH da UF %s.", uf)
+
+            row["arquivos_listados"] = len(found)
+            for name, local_path in found:
+                entry = {
                     "uf_consultada": uf,
-                    "nome": remote.name,
-                    "caminho_remoto": str(remote.path),
-                    "tamanho_remoto_bytes": getattr(remote, "size", ""),
-                    "modificado_remoto": str(getattr(remote, "modify", "")),
+                    "nome": name,
+                    "caminho_remoto": f"{ftp_directory}/{name}",
+                    "tamanho_remoto_bytes": "",
+                    "modificado_remoto": "",
                     "grupo": "RD",
-                    "status_download": "pendente",
-                    "sha256_local": "",
-                    "tamanho_local_bytes": "",
+                    "status_download": "baixado",
+                    "sha256_local": sha256_file(local_path),
+                    "tamanho_local_bytes": local_path.stat().st_size,
                     "erro": "",
                 }
-                inventory.append(inv)
-                try:
-                    local = await remote.download()
-                    local_path = Path(local.path)
-                    if not local_path.is_file():
-                        raise FileNotFoundError(f"Arquivo local não encontrado: {local_path}")
+                inventory.append(entry)
+                row["arquivos_baixados"] += 1
 
-                    inv.update({
-                        "status_download": "baixado",
-                        "sha256_local": sha256_file(local_path),
-                        "tamanho_local_bytes": local_path.stat().st_size,
-                    })
-                    frame = await local.load()
+                try:
+                    dbc = DBC(path=local_path)
+                    frame = await dbc.load()
                     if not isinstance(frame, pd.DataFrame):
                         frame = pd.DataFrame(frame)
-
-                    selected = filter_rmb_records(frame, remote.name)
+                    selected = filter_rmb_records(frame, name)
                     selected_frames.append(selected)
-                    row["arquivos_baixados"] += 1
                     log.info(
                         "%s: %d linhas brutas; %d registros RMB/A00-A09.",
-                        remote.name, len(frame), len(selected)
+                        name, len(frame), len(selected)
                     )
                 except Exception as exc:
                     message = f"{type(exc).__name__}: {exc}"
-                    inv["erro"] = message
-                    errors.append({"uf": uf, "arquivo": remote.name, "erro": message})
-                    log.exception("Falha ao baixar/processar %s.", remote.name)
+                    entry["erro"] = message
+                    errors.append({"uf": uf, "arquivo": name, "erro": message})
+                    log.exception("Falha ao interpretar %s.", name)
 
-            row["status"] = (
-                "download_concluido"
-                if row["arquivos_baixados"] == row["arquivos_listados"]
-                else "download_parcial"
-            )
+            if row["erro"]:
+                row["status"] = "erro_recuperacao"
+            elif not found:
+                row["status"] = "nenhum_arquivo_mensal_encontrado"
+                log.warning("%s: nenhum arquivo mensal encontrado para %04d-%02d.", uf, YEAR, MONTH)
+            else:
+                row["status"] = "download_concluido"
+                log.info("%s: %d arquivo(s) recuperado(s).", uf, len(found))
             coverage.append(row)
+
     finally:
         await ftp.close()
 
@@ -279,25 +277,24 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
     write_csv(repetitions, output / "repeticoes_n_aih_resumo.csv")
     write_csv(error_df, output / "erros_execucao.csv")
 
-    listed_ufs = {
+    found_ufs = sorted({
         row["uf"] for row in coverage if row["arquivos_listados"] > 0
-    }
-    missing_ufs = sorted(set(UFS) - listed_ufs)
+    })
+    missing_ufs = sorted(set(UFS) - set(found_ufs))
     metadata = {
         "projeto": "IARA Data Hub",
         "sistema": "SIH-RD",
-        "fonte": "FTP DATASUS oficial via PySUS",
+        "fonte": "FTP DATASUS oficial (ftp.datasus.gov.br)",
         "pysus_version": importlib.metadata.version("pysus"),
         "python_version": os.sys.version.split()[0],
+        "diretorio_ftp": ftp_directory,
         "competencia_processamento": f"{YEAR}-{MONTH:02d}",
         "ufs_solicitadas": UFS,
-        "ufs_com_arquivos": sorted(listed_ufs),
-        "ufs_sem_dbc_listado": missing_ufs,
-        "total_entradas_dataset_sih": len(content),
-        "total_arquivos_remotos": len(remote_files),
-        "total_dbc_rd_listados": len(monthly_files),
-        "total_dbc_baixados": int(
-            (inventory_df.get("status_download", pd.Series(dtype=str)) == "baixado").sum()
+        "ufs_com_arquivos": found_ufs,
+        "ufs_sem_arquivo_mensal_encontrado": missing_ufs,
+        "total_dbc_rd_listados_e_baixados": int(len(inventory)),
+        "total_dbc_interpretados": int(
+            sum(1 for entry in inventory if not entry["erro"])
         ),
         "registros_rmb_a00_a09": int(len(records)),
         "aih_repetidas_registradas_em_chaves": int(
@@ -306,8 +303,9 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
         "total_erros": len(errors),
         "completo": not errors and not missing_ufs,
         "nota": (
-            "Descoberta de arquivos feita pela API FTP documentada do PySUS; "
-            "competência de processamento não equivale ao ano civil de DT_INTER. "
+            "Arquivos consultados por nome exato via RETR no diretório oficial "
+            "SIH-RD (2008 em diante), sem varredura do diretório inteiro. "
+            "Competência de processamento não equivale ao ano civil de DT_INTER. "
             "Nenhuma linha individual nem N_AIH foi exportada nos relatórios."
         ),
         "executado_em_utc": datetime.now(timezone.utc).isoformat(),
@@ -318,8 +316,8 @@ async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
 
     shutil.rmtree(cache, ignore_errors=True)
     log.info(
-        "Finalizado: arquivos RD=%d; selecionados=%d; erros=%d; UFs sem arquivo=%d.",
-        len(monthly_files), len(records), len(errors), len(missing_ufs)
+        "Finalizado: DBCs=%d; selecionados=%d; erros=%d; UFs sem arquivo=%d.",
+        len(inventory), len(records), len(errors), len(missing_ufs)
     )
     return metadata
 
