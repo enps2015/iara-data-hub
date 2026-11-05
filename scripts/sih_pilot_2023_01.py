@@ -140,7 +140,7 @@ def write_csv(frame: pd.DataFrame, path: Path) -> None:
 
 async def run_extraction(output: Path, log: logging.Logger) -> dict[str, Any]:
     """List and download SIH-RD DBCs directly from the DATASUS FTP directory."""
-        from pysus.api.ftp.client import FTP
+    from pysus.api.ftp.client import FTP
     from pysus.api.extensions import DBC
 
     cache = output / ".pysus_cache"
